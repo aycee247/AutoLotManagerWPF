@@ -1,19 +1,25 @@
 ﻿<mah:MetroWindow x:Class="AutoLotManager.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-                 xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 mc:Ignorable="d"
-        Title="Auto Lot Manager"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        Title="{Binding WindowTitle}"
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         ShowTitleBar="True"
         TitleCharacterCasing="Normal"
         SaveWindowPosition="True"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
-                 ResizeMode="CanResizeWithGrip">
+        ResizeMode="CanResizeWithGrip">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding WindowLoadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <mah:MetroWindow.Resources>
         <DataTemplate x:Key="MenuItemTemplate" DataType="{x:Type mah:HamburgerMenuGlyphItem}">
             <Grid Height="48">
@@ -65,8 +71,8 @@
             </Button>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
-    <Grid>
-        <mah:HamburgerMenu x:Name="HamburgerMenuControl"
+    <Grid x:Name="gridLayoutRoot">
+        <mah:HamburgerMenu x:Name="hmcLeftMenu"
                         Foreground="White"
                         PaneBackground="#FF444444"
                         IsPaneOpen="False"
@@ -76,24 +82,22 @@
             <!--  Content  -->
             <mah:HamburgerMenu.ContentTemplate>
                 <DataTemplate DataType="{x:Type mah:HamburgerMenuItem}">
-                    <Grid x:Name="TheContentGrid">
+                    <Grid x:Name="gridMenuContent">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Border Grid.Row="0"
-                    Background="#FF444444">
-                            <TextBlock x:Name="Header"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontSize="24"
-                            Foreground="White"
-                            Text="{Binding Label}" />
+                        <Border x:Name="borderTopBar" Background="#FF444444">
+                            <TextBlock x:Name="tbHeader"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="24"
+                                       Foreground="White"
+                                       Text="Always making progress..."/>
                         </Border>
-                        <ContentControl x:Name="TheContent"
-                            Grid.Row="1"
-                            Focusable="False"
-                            Content="{Binding Tag}" />
+                        <Grid x:Name="gridPageContent" Background="LightBlue" Grid.Row="1">
+                            <mah:ProgressRing></mah:ProgressRing>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </mah:HamburgerMenu.ContentTemplate>
@@ -121,5 +125,7 @@
                 </mah:HamburgerMenuItemCollection>
             </mah:HamburgerMenu.OptionsItemsSource>
         </mah:HamburgerMenu>
+       
     </Grid>
+    
 </mah:MetroWindow>
