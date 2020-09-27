@@ -18,7 +18,10 @@ namespace AutoLotManager.ViewModel
             : base()
         {
             WindowLoadedCommand = new DelegateCommand(WindowLoaded);
+            ProgressTileClickedCommand = new DelegateCommand(ProgressTileClicked);
         }
+
+        
         #endregion
 
         #region Public Properties and Backing Fields
@@ -37,14 +40,32 @@ namespace AutoLotManager.ViewModel
             }
         }
 
+        private bool _displayProgressRing = default;
+
+        public bool DisplayProgressRing
+        {
+            get
+            {
+                return _displayProgressRing;
+            }
+            set
+            {
+                _displayProgressRing = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region ICommands
         public ICommand WindowLoadedCommand { get; }
+        public ICommand ProgressTileClickedCommand { get; }
         #endregion
 
         #region Command Methods/Callbacks
-
+        private void ProgressTileClicked()
+        {
+            DisplayProgressRing = true;
+        }
         #endregion
 
         #region Load Data

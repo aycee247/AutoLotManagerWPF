@@ -19,5 +19,10 @@ namespace AutoLotManager.Desktop
             DataContext = _vm;
             
         }
+
+        private void Tile_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
