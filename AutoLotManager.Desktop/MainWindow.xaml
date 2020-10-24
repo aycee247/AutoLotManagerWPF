@@ -100,7 +100,70 @@
                         <DropShadowEffect BlurRadius="10" ShadowDepth="{DynamicResource dblShadowDepth}"/>
                     </Border.Effect>
                     <Grid x:Name="gridPageContent" Grid.Row="1">
-                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="0" Grid.Row="1" Title="Make progress forever!" HorizontalContentAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="1" Grid.Row="1" Title="Make progress forever!" HorizontalContentAlignment="Center">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Grid>
+                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
+                            </Grid>
+                        </mah:Tile>
+                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="2" Grid.Row="1" Title="Make progress forever!" HorizontalContentAlignment="Center">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Grid>
+                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
+                            </Grid>
+                        </mah:Tile>
+                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="3" Grid.Row="1" Title="Make progress forever!" HorizontalContentAlignment="Center">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Grid>
+                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
+                            </Grid>
+                        </mah:Tile>
+                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="1" Grid.Row="2" Title="Make progress forever!" HorizontalContentAlignment="Center">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Grid>
+                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
+                            </Grid>
+                        </mah:Tile>
+                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="2" Grid.Row="2" Title="Make progress forever!" HorizontalContentAlignment="Center">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Grid>
+                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
+                            </Grid>
+                        </mah:Tile>
+                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="3" Grid.Row="2" Title="Make progress forever!" HorizontalContentAlignment="Center">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
@@ -118,7 +181,7 @@
                                     </StackPanel>
                                 </Button.Content>
                             </Button>-->
-                        <mah:ProgressRing IsActive="{Binding DisplayProgressRing}"/>
+                        <mah:ProgressRing IsActive="{Binding DisplayProgressRing}" Grid.ColumnSpan="5" Grid.RowSpan="4"/>
                     </Grid>
                 </Border>
             </Grid>

@@ -64,7 +64,7 @@ namespace AutoLotManager.ViewModel
         #region Command Methods/Callbacks
         private void ProgressTileClicked()
         {
-            DisplayProgressRing = true;
+            DisplayProgressRing = !_displayProgressRing;
         }
         #endregion
 
