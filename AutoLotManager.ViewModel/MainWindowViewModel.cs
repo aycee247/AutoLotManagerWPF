@@ -1,6 +1,7 @@
 ﻿using Prism.Commands;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Windows.Input;
 
@@ -19,9 +20,8 @@ namespace AutoLotManager.ViewModel
         {
             WindowLoadedCommand = new DelegateCommand(WindowLoaded);
             ProgressTileClickedCommand = new DelegateCommand(ProgressTileClicked);
+            GithubIconClickedCommand = new DelegateCommand(GithubIconClicked);
         }
-
-        
         #endregion
 
         #region Public Properties and Backing Fields
@@ -29,12 +29,12 @@ namespace AutoLotManager.ViewModel
 
         public string WindowTitle
         {
-            get 
-            { 
-                return _windowTitle; 
+            get
+            {
+                return _windowTitle;
             }
-            set 
-            { 
+            set
+            {
                 _windowTitle = value;
                 OnPropertyChanged();
             }
@@ -59,12 +59,18 @@ namespace AutoLotManager.ViewModel
         #region ICommands
         public ICommand WindowLoadedCommand { get; }
         public ICommand ProgressTileClickedCommand { get; }
+        public ICommand GithubIconClickedCommand { get; }
         #endregion
 
         #region Command Methods/Callbacks
         private void ProgressTileClicked()
         {
             DisplayProgressRing = !_displayProgressRing;
+        }
+
+        private void GithubIconClicked()
+        {
+            Process.Start("http://www.github.com/aycee247/");
         }
         #endregion
 

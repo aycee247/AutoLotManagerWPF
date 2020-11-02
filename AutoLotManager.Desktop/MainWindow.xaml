@@ -50,6 +50,12 @@
                 <iconPacks:PackIconModern Width="22"
                                   Height="22"
                                   Kind="SocialGithubOctocat" />
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <i:InvokeCommandAction Command="{Binding GithubIconClickedCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                    
             </Button>
         </mah:WindowCommands>
     </mah:MetroWindow.LeftWindowCommands>
@@ -194,7 +200,7 @@
                 <mah:HamburgerMenuItemCollection>
                     <mah:HamburgerMenuGlyphItem Glyph="&#xE10F;" Label="Home"/>
 
-                    <mah:HamburgerMenuGlyphItem Glyph="&#xE77B;" Label="Private"/>
+                    <mah:HamburgerMenuGlyphItem Glyph="&#xE77B;" Label="Inventory"/>
 
                     <mah:HamburgerMenuGlyphItem Glyph="&#xE115;" Label="Settings"/>
                 </mah:HamburgerMenuItemCollection>
