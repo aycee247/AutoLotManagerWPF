@@ -18,6 +18,9 @@ namespace AutoLotManager.Desktop
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MTMxNjQ2MUAzMjMwMmUzNDJlMzBPOC81RW1sOGQxWUdSRmc1bmRWeE5KTjcrWUxkamJxbHFkcjk5Mk03SmxVPQ==");
+
+
             var bootstrapper = new Bootstrapper();
             var container = bootstrapper.Bootstrap();
 

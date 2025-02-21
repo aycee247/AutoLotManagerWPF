@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLotManager.Desktop", "AutoLotManager.Desktop\AutoLotManager.Desktop.csproj", "{EC61E450-C42D-4337-9623-D6979E1DDEA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLotManager.ViewModel", "AutoLotManager.ViewModel\AutoLotManager.ViewModel.csproj", "{EF4A4BFC-73E8-4F50-8228-ED7EE36A27CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoLotManager.ViewModel", "AutoLotManager.ViewModel\AutoLotManager.ViewModel.csproj", "{EF4A4BFC-73E8-4F50-8228-ED7EE36A27CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLotManager.Core", "AutoLotManager.Core\AutoLotManager.Core.csproj", "{217CBC4E-44C1-42B4-B591-676B9DA8165A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{EF4A4BFC-73E8-4F50-8228-ED7EE36A27CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF4A4BFC-73E8-4F50-8228-ED7EE36A27CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF4A4BFC-73E8-4F50-8228-ED7EE36A27CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{217CBC4E-44C1-42B4-B591-676B9DA8165A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{217CBC4E-44C1-42B4-B591-676B9DA8165A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{217CBC4E-44C1-42B4-B591-676B9DA8165A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{217CBC4E-44C1-42B4-B591-676B9DA8165A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -16,6 +16,7 @@ namespace AutoLotManager.Desktop.Startup
             var builder = new ContainerBuilder();
             builder.RegisterType<MainWindow>().AsSelf();
             builder.RegisterType<MainWindowViewModel>().AsSelf();
+            
 
             return builder.Build();
         }

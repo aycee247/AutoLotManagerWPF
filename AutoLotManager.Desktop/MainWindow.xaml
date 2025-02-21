@@ -5,8 +5,12 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="AutoLotManager.Desktop.MainWindow"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=MaterialDark}"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         WindowState="Maximized"
@@ -15,7 +19,9 @@
         TitleCharacterCasing="Normal"
         SaveWindowPosition="True"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
-        ResizeMode="CanResizeWithGrip">
+        ResizeMode="CanResizeWithGrip"
+        Height="600"
+        Width="800">
     <mah:MetroWindow.Resources>
         <DataTemplate x:Key="MenuItemTemplate" DataType="{x:Type mah:HamburgerMenuGlyphItem}">
             <Grid Height="48">
@@ -86,12 +92,15 @@
                         IsPaneOpen="False"
                            ItemTemplate="{StaticResource MenuItemTemplate}"
                            OptionsItemTemplate="{StaticResource MenuItemTemplate}"
-                        DisplayMode="CompactInline">
+                        DisplayMode="CompactInline"
+                           SelectedItem="{Binding SelectedMenuItem}"
+                           ItemClick="hmcLeftMenu_ItemClick">
             <!--  Content  -->
+            
             <Grid x:Name="gridMenuContent">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="48" />
-                    <RowDefinition />
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Border x:Name="borderTopBar" Background="#FF444444">
                     <TextBlock x:Name="tbHeader"
@@ -106,91 +115,37 @@
                         <DropShadowEffect BlurRadius="10" ShadowDepth="{DynamicResource dblShadowDepth}"/>
                     </Border.Effect>
                     <Grid x:Name="gridPageContent" Grid.Row="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="1" Grid.Row="1" Title="Make progress forever!" HorizontalContentAlignment="Center">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Grid>
-                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
-                            </Grid>
-                        </mah:Tile>
-                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="2" Grid.Row="1" Title="Make progress forever!" HorizontalContentAlignment="Center">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Grid>
-                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
-                            </Grid>
-                        </mah:Tile>
-                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="3" Grid.Row="1" Title="Make progress forever!" HorizontalContentAlignment="Center">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Grid>
-                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
-                            </Grid>
-                        </mah:Tile>
-                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="1" Grid.Row="2" Title="Make progress forever!" HorizontalContentAlignment="Center">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Grid>
-                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
-                            </Grid>
-                        </mah:Tile>
-                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="2" Grid.Row="2" Title="Make progress forever!" HorizontalContentAlignment="Center">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Grid>
-                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
-                            </Grid>
-                        </mah:Tile>
-                        <mah:Tile Click="Tile_Click" Background="{StaticResource MahApps.Brushes.Accent4}" BorderBrush="{StaticResource MahApps.Brushes.Accent}" BorderThickness="3" Width="300" Height="150" Grid.Column="3" Grid.Row="2" Title="Make progress forever!" HorizontalContentAlignment="Center">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <i:InvokeCommandAction Command="{Binding ProgressTileClickedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Grid>
-                                <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
-                            </Grid>
-                        </mah:Tile>
-                        <!--<Button Width="160" Height="110" Background="Aqua" Opacity=".7">
-                                <Button.Content>
-                                    <StackPanel Orientation="Vertical">
-                                        <iconPacks:PackIconFontAwesome HorizontalAlignment="Center" Kind="FlagCheckeredSolid" Foreground="#FFFFFF" Height="50" Width="50"/>
-                                        <Label Content="This is the content"/>
-                                    </StackPanel>
-                                </Button.Content>
-                            </Button>-->
+                        <Frame x:Name="frameContent" NavigationUIVisibility="Hidden"></Frame>
+                        <!--<StackPanel>
+                        <DataGrid ItemsSource="{Binding Cars}"
+                                  CanUserAddRows="False"
+                                  SelectionUnit="Cell"
+                                  SelectionMode="Extended" 
+                                  Padding="5"
+                                  Margin="15"
+                                  Height="300"
+                                  BorderBrush="Aquamarine"
+                                  BorderThickness="2"
+                                  VerticalAlignment="Top"
+                                  VerticalScrollBarVisibility="Auto"
+                                  GridLinesVisibility="All"/>
+                            --><!--<StackPanel Margin="15" Orientation="Horizontal">
+                                <materialDesign:Card Padding="32">
+                                    <TextBlock >My First Material Design App</TextBlock>
+                                </materialDesign:Card>
+                                <materialDesign:Card Padding="32">
+                                    <TextBlock >My First Material Design App</TextBlock>
+                                </materialDesign:Card>
+                                <materialDesign:Card Padding="32">
+                                    <TextBlock >My First Material Design App</TextBlock>
+                                </materialDesign:Card>
+                            </StackPanel>--><!--
+                        </StackPanel>-->
                         <mah:ProgressRing IsActive="{Binding DisplayProgressRing}" Grid.ColumnSpan="5" Grid.RowSpan="4"/>
                     </Grid>
                 </Border>
             </Grid>
+            
             <!--<mah:HamburgerMenu.ContentTemplate>
                 <DataTemplate DataType="{x:Type mah:HamburgerMenuItem}">
                     

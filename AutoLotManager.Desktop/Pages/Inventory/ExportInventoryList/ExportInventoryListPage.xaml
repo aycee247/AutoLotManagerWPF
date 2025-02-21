@@ -1,0 +1,35 @@
+﻿<Page x:Class="AutoLotManager.Desktop.Pages.Inventory.ExportInventoryListPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:AutoLotManager.Desktop.Pages"
+      xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+      xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+      syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=MaterialLight}"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="ExportInventoryListPage">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" MinHeight="120"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Background="AntiqueWhite">
+
+        </Grid>
+        <syncfusion:SfDataGrid  x:Name="dg_Inventory"
+                                Grid.Row="1"
+                                Margin="10"
+                                ItemsSource="{Binding Cars}"
+                                AllowFiltering="True"
+                                HeaderRowHeight="26"
+                                SelectionMode="Extended"
+                                ColumnSizer="Auto"
+                                AllowGrouping="True">
+
+        </syncfusion:SfDataGrid>
+    </Grid>
+</Page>
