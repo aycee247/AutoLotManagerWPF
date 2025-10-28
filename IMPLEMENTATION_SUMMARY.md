@@ -105,8 +105,16 @@ switch (label)
 
 After (convention-based):
 ```csharp
-var page = _navigationService.NavigateTo(label);
-frameContent.Content = page;
+try
+{
+    var page = _navigationService.NavigateTo(label);
+    frameContent.Content = page;
+}
+catch (System.Exception ex)
+{
+    Debug.WriteLine($"Navigation error: {ex.Message}");
+    // Optionally show error to user
+}
 ```
 
 To add a new page, just:
@@ -119,7 +127,7 @@ That's it! The convention handles the rest.
 
 ## Testing Notes
 
-Due to the requirement for .NET Framework 4.7.2 SDK which is not available in the CI environment, the implementation could not be compiled and tested automatically. However:
+Due to requiring .NET Framework 4.7.2 SDK which is not available in the CI environment, the implementation could not be compiled and tested automatically. However:
 
 - The code follows established C# and WPF patterns
 - All types are properly defined and referenced
