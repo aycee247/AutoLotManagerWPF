@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using AutoLotManager.Desktop.Navigation;
 using AutoLotManager.ViewModel;
+using AutoLotManager.ViewModel.Pages.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +16,25 @@ namespace AutoLotManager.Desktop.Startup
         public IContainer Bootstrap()
         {
             var builder = new ContainerBuilder();
+            
+            // Register main window and view model
             builder.RegisterType<MainWindow>().AsSelf();
             builder.RegisterType<MainWindowViewModel>().AsSelf();
             
+            // Register view models
+            builder.RegisterType<MainHomePageViewModel>().AsSelf();
+            builder.RegisterType<InventoryHomePageViewModel>().AsSelf();
+            
+            // Register navigation service
+            builder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
 
-            return builder.Build();
+            var container = builder.Build();
+            
+            // Configure navigation registrations
+            var navigationService = container.Resolve<INavigationService>();
+            NavigationConfiguration.RegisterPages(navigationService);
+
+            return container;
         }
     }
 }
