@@ -5,7 +5,6 @@ using AutoLotManager.ViewModel.Pages.Inventory;
 using MahApps.Metro.Controls;
 using System;
 using System.Diagnostics;
-using System.Web.UI.WebControls;
 using System.Windows;
 
 namespace AutoLotManager.Desktop
@@ -52,7 +51,7 @@ namespace AutoLotManager.Desktop
                 Debug.WriteLine($"Navigation error: {ex.Message}");
                 // TODO: Consider adding user notification for production
             }
-            catch (System.ArgumentNullException ex)
+            catch (ArgumentNullException ex)
             {
                 Debug.WriteLine($"Navigation error: {ex.Message}");
             }
