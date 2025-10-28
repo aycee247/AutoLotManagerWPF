@@ -110,12 +110,19 @@ try
     var page = _navigationService.NavigateTo(label);
     frameContent.Content = page;
 }
-catch (System.Exception ex)
+catch (InvalidOperationException ex)
 {
+    // Page not registered
     Debug.WriteLine($"Navigation error: {ex.Message}");
-    // Optionally show error to user
+    // TODO: Consider using ILogger instead of Debug.WriteLine
+    // TODO: Optionally show error to user via message box or notification
 }
 ```
+
+> **Note**: The current implementation uses `Debug.WriteLine` for simplicity. For production use, consider:
+> - Using a logging framework (e.g., Serilog, NLog) or ILogger interface
+> - Catching specific exceptions (InvalidOperationException, ArgumentNullException)
+> - Showing user-friendly error messages for navigation failures
 
 To add a new page, just:
 1. Create the view and view model
@@ -147,11 +154,12 @@ When testing locally with the full .NET Framework SDK:
 ## Future Enhancements
 
 Consider adding:
-- Navigation history stack
-- Forward/back navigation
-- Navigation parameters/state
-- Navigation guards/middleware
-- Async navigation support
-- Page lifecycle events (OnNavigatedTo, OnNavigatedFrom)
-- Breadcrumb navigation
-- Tab-based navigation support
+- **Logging** - Replace Debug.WriteLine with proper logging framework (ILogger, Serilog, NLog)
+- **Error Handling** - More specific exception types and user-friendly error messages
+- **Navigation history stack** - Back/forward navigation
+- **Navigation parameters/state** - Pass data between pages
+- **Navigation guards/middleware** - Authorization, validation before navigation
+- **Async navigation support** - For pages that need to load data
+- **Page lifecycle events** - OnNavigatedTo, OnNavigatedFrom hooks
+- **Breadcrumb navigation** - Show navigation path
+- **Tab-based navigation** - Support for multiple navigation contexts
