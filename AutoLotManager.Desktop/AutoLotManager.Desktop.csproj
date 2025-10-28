@@ -272,6 +272,9 @@
     <Compile Include="Pages\TilesDefaultPage.xaml.cs">
       <DependentUpon>TilesDefaultPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Navigation\INavigationService.cs" />
+    <Compile Include="Navigation\NavigationService.cs" />
+    <Compile Include="Navigation\NavigationConfiguration.cs" />
     <Compile Include="Startup\Bootstrapper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
