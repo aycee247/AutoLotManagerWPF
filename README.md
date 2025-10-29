@@ -99,9 +99,9 @@ For detailed information, see [NAVIGATION.md](NAVIGATION.md) and [NAVIGATION_EXA
 ### Prerequisites
 
 - Windows Operating System (Windows 10 or later recommended)
-- Visual Studio 2019 or later
-- .NET Framework 4.7.2 SDK
-- NuGet Package Manager
+- Visual Studio 2019 or later (Visual Studio 2022 fully supported)
+- .NET Framework 4.7.2 SDK or later
+- NuGet Package Manager (included with Visual Studio)
 
 ### Installation
 
