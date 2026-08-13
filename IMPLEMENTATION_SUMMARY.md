@@ -147,7 +147,7 @@ Due to requiring .NET Framework 4.7.2 SDK which is not available in the CI envir
 When testing locally with the full .NET Framework SDK:
 1. Build the solution
 2. Run the application
-3. Click through each hamburger menu item (Home, Inventory, Settings, Sales, About)
+3. Click through each hamburger menu item (Home, Inventory, Settings, and About under the options section)
 4. Verify pages load correctly with their view models
 5. Try adding a new page following NAVIGATION_EXAMPLE.md
 

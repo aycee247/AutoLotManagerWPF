@@ -31,7 +31,7 @@ namespace AutoLotManager.Desktop
 
         private void hmcLeftMenu_ItemClick(object sender, ItemClickEventArgs args)
         {
-            var menuItem = (args.Source as HamburgerMenu).SelectedItem as HamburgerMenuGlyphItem;
+            var menuItem = (args.Source as HamburgerMenu)?.SelectedItem as HamburgerMenuGlyphItem;
             if (menuItem == null)
                 return;
 

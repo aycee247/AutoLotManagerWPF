@@ -1,5 +1,6 @@
-// Autofac's IsRegistered/Resolve are extension methods in Autofac.ResolutionExtensions,
-// so the namespace must be imported — fully qualifying Autofac.IContainer is not enough.
+// IsRegistered/Resolve are extension methods (defined on the Autofac.ResolutionExtensions type),
+// so the Autofac namespace must be imported — fully qualifying Autofac.IContainer is not enough,
+// because extension method lookup goes through imported namespaces rather than the type's name.
 using Autofac;
 using System;
 using System.Collections.Generic;

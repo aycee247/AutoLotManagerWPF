@@ -25,7 +25,9 @@ namespace AutoLotManager.Desktop.Navigation
             // Settings page - no view model for now
             navigationService.RegisterPage("Settings", typeof(SettingsHomePage));
 
-            // Sales page - no view model for now
+            // Sales page - no view model for now.
+            // Registered ahead of the UI: MainWindow.xaml has no menu item with Label="Sales",
+            // so this mapping is currently unreachable. See issue #8.
             navigationService.RegisterPage("Sales", typeof(SalesHomePage));
 
             // About page - no view model for now
