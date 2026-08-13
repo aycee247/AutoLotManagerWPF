@@ -193,48 +193,52 @@ See [NAVIGATION_EXAMPLE.md](NAVIGATION_EXAMPLE.md) for a complete walkthrough.
 
 ### Planned Enhancements
 
+Each item below is tracked as a GitHub issue — follow the link for scope and implementation notes.
+
 #### Core Functionality
-- [ ] **Database Integration**: Implement Entity Framework or Dapper for data persistence
-- [ ] **Customer Management**: Add customer entity and CRUD operations
-- [ ] **Sales Transaction Processing**: Complete sales workflow with pricing and payment tracking
-- [ ] **Inventory Reporting**: Generate reports on inventory status, sales trends, and analytics
-- [ ] **Search & Filter**: Advanced search capabilities across inventory and sales
-- [ ] **Data Import/Export**: Support for CSV, Excel, and JSON formats
+- [ ] **Database Integration** ([#6](https://github.com/aycee247/AutoLotManagerWPF/issues/6)): Implement Entity Framework or Dapper for data persistence
+- [ ] **Customer Management** ([#7](https://github.com/aycee247/AutoLotManagerWPF/issues/7)): Add customer entity and CRUD operations
+- [ ] **Sales Transaction Processing** ([#8](https://github.com/aycee247/AutoLotManagerWPF/issues/8)): Complete sales workflow with pricing and payment tracking
+- [ ] **Inventory Reporting** ([#9](https://github.com/aycee247/AutoLotManagerWPF/issues/9)): Generate reports on inventory status, sales trends, and analytics
+- [ ] **Search & Filter** ([#10](https://github.com/aycee247/AutoLotManagerWPF/issues/10)): Advanced search capabilities across inventory and sales
+- [ ] **Data Import/Export** ([#11](https://github.com/aycee247/AutoLotManagerWPF/issues/11)): Support for CSV, Excel, and JSON formats
 
 #### User Interface
-- [ ] **Dashboard with Analytics**: Charts and graphs for sales and inventory metrics
-- [ ] **Print Functionality**: Print invoices, reports, and inventory lists
-- [ ] **Multi-Language Support**: Internationalization (i18n) for global use
-- [ ] **Themes**: Light/dark mode and customizable color schemes
-- [ ] **Responsive Design**: Better layout adaptation for different screen sizes
+- [ ] **Dashboard with Analytics** ([#12](https://github.com/aycee247/AutoLotManagerWPF/issues/12)): Charts and graphs for sales and inventory metrics
+- [ ] **Print Functionality** ([#13](https://github.com/aycee247/AutoLotManagerWPF/issues/13)): Print invoices, reports, and inventory lists
+- [ ] **Multi-Language Support** ([#14](https://github.com/aycee247/AutoLotManagerWPF/issues/14)): Internationalization (i18n) for global use
+- [ ] **Themes** ([#15](https://github.com/aycee247/AutoLotManagerWPF/issues/15)): Light/dark mode and customizable color schemes
+- [ ] **Responsive Design** ([#16](https://github.com/aycee247/AutoLotManagerWPF/issues/16)): Better layout adaptation for different screen sizes
 
 #### Technical Improvements
-- [ ] **Unit Tests**: Comprehensive test coverage for ViewModels and business logic
-- [ ] **Integration Tests**: End-to-end testing of key workflows
-- [ ] **Logging Framework**: Implement structured logging (Serilog, NLog)
-- [ ] **Error Handling**: Global exception handling and user-friendly error messages
-- [ ] **Configuration Management**: External configuration for app settings
-- [ ] **API Integration**: RESTful API for external system integration
-- [ ] **Authentication & Authorization**: User login and role-based access control
+- [ ] **Unit Tests** ([#17](https://github.com/aycee247/AutoLotManagerWPF/issues/17)): Comprehensive test coverage for ViewModels and business logic
+- [ ] **Integration Tests** ([#18](https://github.com/aycee247/AutoLotManagerWPF/issues/18)): End-to-end testing of key workflows
+- [ ] **Logging Framework** ([#19](https://github.com/aycee247/AutoLotManagerWPF/issues/19)): Implement structured logging (Serilog, NLog)
+- [ ] **Error Handling** ([#20](https://github.com/aycee247/AutoLotManagerWPF/issues/20)): Global exception handling and user-friendly error messages
+- [ ] **Configuration Management** ([#21](https://github.com/aycee247/AutoLotManagerWPF/issues/21)): External configuration for app settings
+- [ ] **API Integration** ([#22](https://github.com/aycee247/AutoLotManagerWPF/issues/22)): RESTful API for external system integration
+- [ ] **Authentication & Authorization** ([#23](https://github.com/aycee247/AutoLotManagerWPF/issues/23)): User login and role-based access control
 
 #### Developer Experience
-- [ ] **CI/CD Pipeline**: Automated build, test, and deployment
-- [ ] **Code Documentation**: XML documentation comments for all public APIs
-- [ ] **Style Guide**: Coding standards and conventions document
-- [ ] **Docker Support**: Containerization for easier development and deployment
+- [ ] **CI/CD Pipeline** ([#24](https://github.com/aycee247/AutoLotManagerWPF/issues/24)): Automated build, test, and deployment
+- [ ] **Code Documentation** ([#25](https://github.com/aycee247/AutoLotManagerWPF/issues/25)): XML documentation comments for all public APIs
+- [ ] **Style Guide** ([#26](https://github.com/aycee247/AutoLotManagerWPF/issues/26)): Coding standards and conventions document
+- [ ] **Docker Support** ([#27](https://github.com/aycee247/AutoLotManagerWPF/issues/27)): Containerization for easier development and deployment
 
 ### Ideas for Future Features
 
-- **Vehicle History Tracking**: Maintenance records, service history, accident reports
-- **Photo Management**: Upload and display vehicle photos
-- **Pricing Calculator**: Automated pricing based on market data and vehicle condition
-- **Email Notifications**: Automated alerts for low inventory, pending sales, etc.
-- **Barcode/QR Code Integration**: Quick vehicle lookup and tracking
-- **Mobile Companion App**: Xamarin or MAUI-based mobile application
-- **Cloud Sync**: Multi-device synchronization via cloud storage
-- **Audit Trail**: Track all changes to inventory and sales data
-- **Financial Dashboard**: Integration with accounting systems
-- **Customer Portal**: Self-service portal for customers to view inventory
+Speculative, not committed work — each is tracked as an issue for discussion.
+
+- **Vehicle History Tracking** ([#28](https://github.com/aycee247/AutoLotManagerWPF/issues/28)): Maintenance records, service history, accident reports
+- **Photo Management** ([#29](https://github.com/aycee247/AutoLotManagerWPF/issues/29)): Upload and display vehicle photos
+- **Pricing Calculator** ([#30](https://github.com/aycee247/AutoLotManagerWPF/issues/30)): Automated pricing based on market data and vehicle condition
+- **Email Notifications** ([#31](https://github.com/aycee247/AutoLotManagerWPF/issues/31)): Automated alerts for low inventory, pending sales, etc.
+- **Barcode/QR Code Integration** ([#32](https://github.com/aycee247/AutoLotManagerWPF/issues/32)): Quick vehicle lookup and tracking
+- **Mobile Companion App** ([#33](https://github.com/aycee247/AutoLotManagerWPF/issues/33)): MAUI-based mobile application
+- **Cloud Sync** ([#34](https://github.com/aycee247/AutoLotManagerWPF/issues/34)): Multi-device synchronization via cloud storage
+- **Audit Trail** ([#35](https://github.com/aycee247/AutoLotManagerWPF/issues/35)): Track all changes to inventory and sales data
+- **Financial Dashboard** ([#36](https://github.com/aycee247/AutoLotManagerWPF/issues/36)): Integration with accounting systems
+- **Customer Portal** ([#37](https://github.com/aycee247/AutoLotManagerWPF/issues/37)): Self-service portal for customers to view inventory
 
 ## 🤝 Contributing
 
