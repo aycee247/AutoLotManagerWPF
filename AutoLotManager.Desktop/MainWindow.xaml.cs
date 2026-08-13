@@ -1,7 +1,5 @@
 ﻿using AutoLotManager.Desktop.Navigation;
-using AutoLotManager.Desktop.Pages;
 using AutoLotManager.ViewModel;
-using AutoLotManager.ViewModel.Pages.Inventory;
 using MahApps.Metro.Controls;
 using System;
 using System.Diagnostics;
@@ -51,7 +49,8 @@ namespace AutoLotManager.Desktop
                 Debug.WriteLine($"Navigation error: {ex.Message}");
                 // TODO: Consider adding user notification for production
             }
-            catch (ArgumentNullException ex)
+            // Covers ArgumentNullException (null key) and ArgumentException (empty/whitespace key).
+            catch (ArgumentException ex)
             {
                 Debug.WriteLine($"Navigation error: {ex.Message}");
             }

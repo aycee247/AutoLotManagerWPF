@@ -41,7 +41,7 @@ Software to manage a fictional car lot using WPF, XAML, C#, Autofac, Prism, and 
 
 #### Technical Features
 - **Dependency Injection**: Full IoC container support using Autofac
-- **Convention-Based Navigation**: Automatic page routing based on naming conventions
+- **Centralized Navigation**: Menu labels mapped to pages in one registration file
 - **Extensible Architecture**: Easy to add new pages and features
 - **View Model Resolution**: Automatic view model creation and binding via DI container
 
@@ -102,7 +102,7 @@ For detailed information, see [NAVIGATION.md](NAVIGATION.md) and [NAVIGATION_EXA
 
 - Windows Operating System (Windows 10 or later recommended)
 - Visual Studio 2019 or later (Visual Studio 2022 fully supported)
-- .NET Framework 4.7.2 SDK or later
+- .NET Framework 4.7.2 Developer Pack (targeting pack) or later
 - NuGet Package Manager (included with Visual Studio)
 
 ### Installation

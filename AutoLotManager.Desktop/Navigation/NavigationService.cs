@@ -26,9 +26,14 @@ namespace AutoLotManager.Desktop.Navigation
         /// </summary>
         public Page NavigateTo(string pageKey)
         {
-            if (string.IsNullOrWhiteSpace(pageKey))
+            if (pageKey == null)
             {
                 throw new ArgumentNullException(nameof(pageKey));
+            }
+
+            if (string.IsNullOrWhiteSpace(pageKey))
+            {
+                throw new ArgumentException("Page key must not be empty or whitespace.", nameof(pageKey));
             }
 
             if (!_pageRegistrations.TryGetValue(pageKey, out var registration))
@@ -43,7 +48,7 @@ namespace AutoLotManager.Desktop.Navigation
             if (registration.ViewModelType != null)
             {
                 object viewModel;
-                
+
                 // Try to resolve from container if available
                 if (_container != null && _container.IsRegistered(registration.ViewModelType))
                 {
@@ -51,7 +56,8 @@ namespace AutoLotManager.Desktop.Navigation
                 }
                 else
                 {
-                    // If resolution fails, create directly
+                    // Not registered in the container — construct it directly. Note this is not a
+                    // fallback for a failed Resolve: if Resolve itself throws, the exception bubbles up.
                     viewModel = Activator.CreateInstance(registration.ViewModelType);
                 }
 
@@ -66,9 +72,14 @@ namespace AutoLotManager.Desktop.Navigation
         /// </summary>
         public void RegisterPage(string pageKey, Type pageType, Type viewModelType = null)
         {
-            if (string.IsNullOrWhiteSpace(pageKey))
+            if (pageKey == null)
             {
                 throw new ArgumentNullException(nameof(pageKey));
+            }
+
+            if (string.IsNullOrWhiteSpace(pageKey))
+            {
+                throw new ArgumentException("Page key must not be empty or whitespace.", nameof(pageKey));
             }
 
             if (pageType == null)

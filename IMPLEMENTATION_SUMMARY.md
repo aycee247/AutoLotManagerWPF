@@ -14,7 +14,7 @@ This was error-prone, not maintainable, and violated the Open/Closed Principle.
 A convention-based navigation infrastructure that:
 - **Eliminates hardcoded navigation logic** - No more switch statements
 - **Supports dependency injection** - View models resolved from DI container
-- **Follows conventions** - "PageName" maps to PageNamePage + PageNameViewModel
+- **Explicit registrations** - each key is mapped to its Page and ViewModel types in one place; types are not inferred from the key
 - **Centralized configuration** - All page registrations in one place
 - **Easy to extend** - Adding new pages requires minimal code changes
 

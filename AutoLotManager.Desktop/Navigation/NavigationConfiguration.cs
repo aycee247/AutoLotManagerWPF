@@ -5,8 +5,9 @@ using AutoLotManager.ViewModel.Pages.Inventory;
 namespace AutoLotManager.Desktop.Navigation
 {
     /// <summary>
-    /// Configuration class for registering navigation mappings
-    /// Follows convention: "PageName" maps to "PageNamePage" (View) and "PageNameViewModel" (ViewModel)
+    /// Configuration class for registering navigation mappings.
+    /// Each menu label is mapped explicitly to a Page type and an optional ViewModel type;
+    /// types are not inferred from the key by naming convention.
     /// </summary>
     public static class NavigationConfiguration
     {
@@ -15,7 +16,7 @@ namespace AutoLotManager.Desktop.Navigation
         /// </summary>
         public static void RegisterPages(INavigationService navigationService)
         {
-            // Home page - no view model needed for now
+            // Home page with view model
             navigationService.RegisterPage("Home", typeof(MainHomePage), typeof(MainHomePageViewModel));
 
             // Inventory page with view model

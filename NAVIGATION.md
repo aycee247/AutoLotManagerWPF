@@ -121,9 +121,12 @@ The `NavigationService` is responsible for:
 ### Dependency Resolution
 
 When a view model is registered:
-1. The NavigationService first tries to resolve it from the Autofac container
-2. If resolution fails, it creates an instance directly using `Activator.CreateInstance()`
+1. The NavigationService checks whether the type is registered in the Autofac container
+2. If it is, the container resolves it; if it is not, an instance is created directly using `Activator.CreateInstance()`
 3. The resolved/created view model is set as the page's DataContext
+
+Note that step 2 branches on registration, not on success: if `Resolve` itself throws, the
+exception propagates rather than falling back to `Activator.CreateInstance()`.
 
 ### Error Handling
 
@@ -132,4 +135,5 @@ The NavigationService validates:
 - Page types are registered before navigation
 - Page types derive from `System.Windows.Controls.Page`
 
-If navigation fails, an exception is thrown and logged to Debug output.
+If navigation fails, the NavigationService throws. Logging is the caller's responsibility —
+`MainWindow.xaml.cs` catches the exception and writes it to Debug output.
