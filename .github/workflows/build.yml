@@ -1,0 +1,76 @@
+name: Build
+
+# First pass at CI for the solution (see issue #24).
+#
+# The solution mixes two project styles, which is why restore looks the way it does:
+#   - AutoLotManager.Core / AutoLotManager.ViewModel: SDK-style, netstandard2.0, PackageReference
+#   - AutoLotManager.Desktop:                        legacy csproj, net472, packages.config
+#
+# `msbuild -t:restore` only handles PackageReference, so it would silently skip the Desktop
+# project's packages. The NuGet CLI restores both from a solution-level restore, so that is
+# what runs below.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+# A newer push to the same branch makes an in-flight run redundant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.configuration }}
+    # WPF and .NET Framework need a Windows runner — this will not build on ubuntu.
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Set up NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          # Two locations, because the two project styles restore to different places:
+          # packages.config lands in ./packages, PackageReference in the global cache.
+          path: |
+            ~/.nuget/packages
+            packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config', '**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore NuGet packages
+        run: nuget restore AutoLotManager.sln
+
+      # Platform is deliberately not passed. The solution platform is "Any CPU" while the
+      # projects use "AnyCPU"; forcing /p:Platform at solution level trips that mismatch.
+      - name: Build
+        run: msbuild AutoLotManager.sln /p:Configuration=${{ matrix.configuration }} /m /nologo /v:minimal
+
+      # No test project exists yet — issue #17 adds one. Once it does, run it here, e.g.:
+      #   - name: Test
+      #     run: vstest.console.exe **\bin\${{ matrix.configuration }}\*Tests.dll
+
+      - name: Upload build output
+        if: matrix.configuration == 'Release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoLotManager-Desktop-Release
+          path: AutoLotManager.Desktop/bin/Release/
+          if-no-files-found: error
+          retention-days: 14
