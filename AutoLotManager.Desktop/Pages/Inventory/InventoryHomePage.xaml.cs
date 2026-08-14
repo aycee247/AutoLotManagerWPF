@@ -21,13 +21,9 @@ namespace AutoLotManager.Desktop.Pages
     /// </summary>
     public partial class InventoryHomePage : Page
     {
-        private InventoryHomePageViewModel _vm;
-        public InventoryHomePage(InventoryHomePageViewModel vm)
+        public InventoryHomePage()
         {
             InitializeComponent();
-
-            _vm = vm;
-            this.DataContext = _vm;
         }
     }
 }

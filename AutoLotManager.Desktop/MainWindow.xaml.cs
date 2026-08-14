@@ -1,9 +1,8 @@
-﻿using AutoLotManager.Desktop.Pages;
+﻿using AutoLotManager.Desktop.Navigation;
 using AutoLotManager.ViewModel;
-using AutoLotManager.ViewModel.Pages.Inventory;
 using MahApps.Metro.Controls;
+using System;
 using System.Diagnostics;
-using System.Web.UI.WebControls;
 using System.Windows;
 
 namespace AutoLotManager.Desktop
@@ -14,14 +13,15 @@ namespace AutoLotManager.Desktop
     public partial class MainWindow : MetroWindow
     {
         private MainWindowViewModel _vm;
-        public MainWindow(MainWindowViewModel vm)
+        private INavigationService _navigationService;
+
+        public MainWindow(MainWindowViewModel vm, INavigationService navigationService)
         {
             InitializeComponent();
 
             _vm = vm;
+            _navigationService = navigationService;
             DataContext = _vm;
-            
-            
         }
 
         private void Tile_Click(object sender, RoutedEventArgs e)
@@ -31,26 +31,28 @@ namespace AutoLotManager.Desktop
 
         private void hmcLeftMenu_ItemClick(object sender, ItemClickEventArgs args)
         {
-            var label = ((args.Source as HamburgerMenu).SelectedItem as HamburgerMenuGlyphItem).Label;
-            switch (label)
+            var menuItem = (args.Source as HamburgerMenu)?.SelectedItem as HamburgerMenuGlyphItem;
+            if (menuItem == null)
+                return;
+
+            var label = menuItem.Label;
+            
+            try
             {
-                case "Home":
-                    frameContent.Content = new MainHomePage();
-                    break;
-                case "Inventory":
-                    frameContent.Content = new InventoryHomePage(new InventoryHomePageViewModel());
-                    break;
-                case "Settings":
-                    frameContent.Content = new SettingsHomePage();
-                    break;
-                case "Sales":
-                    frameContent.Content = new SalesHomePage();
-                    break;
-                case "About":
-                    frameContent.Content = new AboutPage();
-                    break;
-                default:
-                    break;
+                // Use the navigation service to navigate to the page
+                var page = _navigationService.NavigateTo(label);
+                frameContent.Content = page;
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Page not registered or navigation failed
+                Debug.WriteLine($"Navigation error: {ex.Message}");
+                // TODO: Consider adding user notification for production
+            }
+            // Covers ArgumentNullException (null key) and ArgumentException (empty/whitespace key).
+            catch (ArgumentException ex)
+            {
+                Debug.WriteLine($"Navigation error: {ex.Message}");
             }
         }
     }
