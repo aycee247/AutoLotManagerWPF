@@ -60,34 +60,44 @@ namespace AutoLotManager.Tests
     [TestFixture]
     public class MainWindowViewModelTests
     {
+        // MainWindowViewModel's constructor generates 1000 Bogus Car records, so building one per
+        // test is needlessly expensive. Tests that only make read-only assertions share the single
+        // instance created in [OneTimeSetUp].
+        //
+        // Tests that mutate state (DisplayProgressRing, WindowTitle) or subscribe to
+        // PropertyChanged MUST keep constructing their own instance: sharing would leak state
+        // between them, break their "starts unset" preconditions, and make the fixture
+        // order-dependent. Do not "tidy" a mutating test onto _sharedViewModel.
+        private MainWindowViewModel _sharedViewModel;
+
+        [OneTimeSetUp]
+        public void CreateSharedViewModel()
+        {
+            _sharedViewModel = new MainWindowViewModel();
+        }
+
         [Test]
         public void Constructor_WiresUpAllCommands()
         {
-            var viewModel = new MainWindowViewModel();
-
             Assert.Multiple(() =>
             {
-                Assert.That(viewModel.WindowLoadedCommand, Is.Not.Null);
-                Assert.That(viewModel.ProgressTileClickedCommand, Is.Not.Null);
-                Assert.That(viewModel.GithubIconClickedCommand, Is.Not.Null);
+                Assert.That(_sharedViewModel.WindowLoadedCommand, Is.Not.Null);
+                Assert.That(_sharedViewModel.ProgressTileClickedCommand, Is.Not.Null);
+                Assert.That(_sharedViewModel.GithubIconClickedCommand, Is.Not.Null);
             });
         }
 
         [Test]
         public void Constructor_PopulatesCarsWithGeneratedInventory()
         {
-            var viewModel = new MainWindowViewModel();
-
-            Assert.That(viewModel.Cars, Is.Not.Null);
-            Assert.That(viewModel.Cars, Is.Not.Empty);
+            Assert.That(_sharedViewModel.Cars, Is.Not.Null);
+            Assert.That(_sharedViewModel.Cars, Is.Not.Empty);
         }
 
         [Test]
         public void Constructor_GeneratesCarsWithPopulatedFields()
         {
-            var viewModel = new MainWindowViewModel();
-
-            var car = viewModel.Cars.First();
+            var car = _sharedViewModel.Cars.First();
 
             Assert.Multiple(() =>
             {
@@ -99,6 +109,7 @@ namespace AutoLotManager.Tests
             });
         }
 
+        // Everything below mutates state or observes events, so each test builds its own instance.
         [Test]
         public void WindowLoaded_SetsTheWindowTitle()
         {
