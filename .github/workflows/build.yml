@@ -35,24 +35,29 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Set up NuGet
-        uses: NuGet/setup-nuget@v2
+        uses: NuGet/setup-nuget@v4
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           # Two locations, because the two project styles restore to different places:
           # packages.config lands in ./packages, PackageReference in the global cache.
           path: |
             ~/.nuget/packages
             packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config', '**/*.csproj') }}
-          restore-keys: ${{ runner.os }}-nuget-
+          # The configuration is part of the key so the Debug and Release matrix jobs do not
+          # race to reserve the same cache entry (only one of them would win, and the loser
+          # logged "Unable to reserve cache with key ..., another job may be creating this cache").
+          key: ${{ runner.os }}-nuget-${{ matrix.configuration }}-${{ hashFiles('**/packages.config', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ matrix.configuration }}-
+            ${{ runner.os }}-nuget-
 
       - name: Restore NuGet packages
         run: nuget restore AutoLotManager.sln
@@ -79,7 +84,7 @@ jobs:
 
       - name: Upload build output
         if: matrix.configuration == 'Release'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AutoLotManager-Desktop-Release
           path: AutoLotManager.Desktop/bin/Release/

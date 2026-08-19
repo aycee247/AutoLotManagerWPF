@@ -1,0 +1,28 @@
+version: 2
+
+updates:
+  # Keeps the actions used by .github/workflows/build.yml current. Without this, action
+  # majors drift until a runner deprecation (e.g. the Node 20 -> Node 24 move) forces a
+  # manual sweep.
+  #
+  # No `labels:` key here on purpose: custom labels suppress the `dependencies` label
+  # Dependabot creates by default, and Dependabot only applies custom labels that already
+  # exist in the repo — this repo has none of them, so PRs would land unlabeled.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+
+  # NuGet packages across the solution. Note the two project styles: the SDK-style projects
+  # (Core, ViewModel, Tests) use PackageReference and are fully supported, while the legacy
+  # Desktop project uses packages.config, which Dependabot supports only partially — expect
+  # fewer or no PRs for that project.
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
