@@ -1,5 +1,5 @@
 // IsRegistered/Resolve are extension methods (defined on the Autofac.ResolutionExtensions type),
-// so the Autofac namespace must be imported — fully qualifying Autofac.IContainer is not enough,
+// so the Autofac namespace must be imported — fully qualifying the scope type is not enough,
 // because extension method lookup goes through imported namespaces rather than the type's name.
 using Autofac;
 using System;
@@ -26,7 +26,7 @@ namespace AutoLotManager.Desktop.Navigation
     /// </para>
     /// <para>
     /// Pages are always created with <see cref="Activator.CreateInstance(Type)"/> and therefore need
-    /// a public parameterless constructor. View models are created either from the Autofac container
+    /// a public parameterless constructor. View models are created either from the Autofac lifetime scope
     /// or by <see cref="Activator.CreateInstance(Type)"/>; see <see cref="NavigateTo"/> for exactly
     /// when each path is taken.
     /// </para>
@@ -39,23 +39,31 @@ namespace AutoLotManager.Desktop.Navigation
         private readonly Dictionary<string, PageRegistration> _pageRegistrations;
 
         /// <summary>
-        /// Container used to resolve view models, or <c>null</c> when none was supplied.
-        /// A null container is treated the same as a container with nothing registered.
+        /// Lifetime scope used to resolve view models, or <c>null</c> when none was supplied.
+        /// A null scope is treated the same as a scope with nothing registered.
         /// </summary>
-        private readonly Autofac.IContainer _container;
+        /// <remarks>
+        /// Typed as <see cref="ILifetimeScope"/> rather than <c>IContainer</c> deliberately. Autofac
+        /// self-registers only <see cref="ILifetimeScope"/> and <see cref="IComponentContext"/>; it
+        /// never registers <c>IContainer</c>. Taking <c>IContainer</c> here made this type
+        /// unresolvable, which broke application startup — see the regression test in
+        /// AutoLotManager.Tests/BootstrapperTests.cs.
+        /// </remarks>
+        private readonly ILifetimeScope _scope;
 
         /// <summary>
         /// Initializes a new instance with an empty, case-insensitive page registry.
         /// </summary>
-        /// <param name="container">
-        /// The Autofac container used to resolve view model instances. May be <c>null</c>: view
+        /// <param name="scope">
+        /// The Autofac lifetime scope used to resolve view model instances. Autofac self-registers
+        /// this service, so the container satisfies it automatically. May be <c>null</c>: view
         /// models are then always constructed with <see cref="Activator.CreateInstance(Type)"/>,
         /// which is how the unit tests exercise this type. The argument is not validated.
         /// </param>
-        public NavigationService(Autofac.IContainer container)
+        public NavigationService(ILifetimeScope scope)
         {
             _pageRegistrations = new Dictionary<string, PageRegistration>(StringComparer.OrdinalIgnoreCase);
-            _container = container;
+            _scope = scope;
         }
 
         /// <summary>
@@ -72,9 +80,9 @@ namespace AutoLotManager.Desktop.Navigation
         /// <c>DataContext</c> is left null.
         /// </returns>
         /// <remarks>
-        /// View model creation takes one of two paths. If a container was supplied and the view
+        /// View model creation takes one of two paths. If a scope was supplied and the view
         /// model type is registered in it (<c>IsRegistered</c>), the instance comes from the
-        /// container's <c>Resolve</c>. Otherwise — that is, when the type is not registered — it is
+        /// scope's <c>Resolve</c>. Otherwise — that is, when the type is not registered — it is
         /// constructed directly with
         /// <see cref="Activator.CreateInstance(Type)"/>. The direct construction is not a fallback
         /// for a failed resolve: if <c>Resolve</c> itself throws, that exception propagates to the
@@ -115,14 +123,14 @@ namespace AutoLotManager.Desktop.Navigation
             {
                 object viewModel;
 
-                // Try to resolve from container if available
-                if (_container != null && _container.IsRegistered(registration.ViewModelType))
+                // Try to resolve from the scope if available
+                if (_scope != null && _scope.IsRegistered(registration.ViewModelType))
                 {
-                    viewModel = _container.Resolve(registration.ViewModelType);
+                    viewModel = _scope.Resolve(registration.ViewModelType);
                 }
                 else
                 {
-                    // Not registered in the container — construct it directly. Note this is not a
+                    // Not registered in the scope — construct it directly. Note this is not a
                     // fallback for a failed Resolve: if Resolve itself throws, the exception bubbles up.
                     viewModel = Activator.CreateInstance(registration.ViewModelType);
                 }

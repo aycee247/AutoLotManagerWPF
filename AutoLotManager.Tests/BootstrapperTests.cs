@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using Autofac;
-using Autofac.Core;
 using AutoLotManager.Desktop;
 using AutoLotManager.Desktop.Navigation;
 using AutoLotManager.Desktop.Pages;
@@ -20,10 +19,11 @@ namespace AutoLotManager.Tests
     /// for at startup. A missing registration compiles cleanly and only surfaces when
     /// App.Application_Startup runs — which is to say, in front of a user.
     ///
-    /// It surfaces here instead: Bootstrap() cannot currently complete. See
-    /// Bootstrap_FailsBecauseAutofacDoesNotSelfRegisterIContainer for the detail. Every test that
-    /// needs the container reports as ignored until that is fixed, at which point they take over
-    /// automatically and the characterization test starts failing to say so.
+    /// These were written against a live defect: NavigationService took an Autofac.IContainer, which
+    /// Autofac never self-registers, so Bootstrap() threw DependencyResolutionException and the
+    /// application died on startup. The constructor now takes ILifetimeScope, which Autofac does
+    /// self-register, and these tests are the regression guard — widen that parameter back to a type
+    /// the container cannot supply and every test in this fixture fails.
     ///
     /// The fixture runs on an STA thread because navigation constructs WPF Pages, and creating a
     /// DispatcherObject off an STA thread throws.
@@ -33,7 +33,6 @@ namespace AutoLotManager.Tests
     public class BootstrapperTests
     {
         private IContainer _container;
-        private Exception _bootstrapFailure;
 
         [OneTimeSetUp]
         public void BootstrapOnce()
@@ -41,17 +40,11 @@ namespace AutoLotManager.Tests
             // One container for the fixture: Bootstrap() is itself under test and there is no reason
             // to repeat it per test, and sharing the result keeps the expensive resolves down to one
             // each — MainWindowViewModel's constructor generates 1000 Bogus records.
-            try
-            {
-                _container = new Bootstrapper().Bootstrap();
-            }
-            catch (Exception ex)
-            {
-                // Captured rather than allowed to escape: an exception out of [OneTimeSetUp] aborts
-                // every test in the fixture with the same error, which hides which parts of the graph
-                // are sound. The Bootstrap_* test asserts on this directly instead.
-                _bootstrapFailure = ex;
-            }
+            //
+            // Deliberately not wrapped in a try/catch. If Bootstrap() throws, every test in the
+            // fixture should fail with that exception: the object graph not building is precisely
+            // the failure this fixture exists to catch.
+            _container = new Bootstrapper().Bootstrap();
         }
 
         [OneTimeTearDown]
@@ -61,22 +54,6 @@ namespace AutoLotManager.Tests
             {
                 _container.Dispose();
             }
-        }
-
-        /// <summary>
-        /// Container-backed tests go through this so that, while bootstrapping is broken, they report
-        /// as ignored behind the one real failure instead of burying it in noise.
-        /// </summary>
-        private IContainer RequireContainer()
-        {
-            if (_container == null)
-            {
-                Assert.Ignore(
-                    "Bootstrap() did not return a container, so the object graph cannot be exercised: " +
-                    (_bootstrapFailure == null ? "no exception recorded" : _bootstrapFailure.ToString()));
-            }
-
-            return _container;
         }
 
         /// <summary>
@@ -100,25 +77,17 @@ namespace AutoLotManager.Tests
         #region Bootstrapping
 
         /// <summary>
-        /// Characterization test for a live defect, not an endorsement of it.
-        ///
-        /// NavigationService's only public constructor takes an <see cref="IContainer"/>, but Autofac
-        /// does not self-register that service — ContainerBuilder.Build registers exactly one
-        /// self-registration, exposing ILifetimeScope and IComponentContext and nothing else. So the
-        /// container.Resolve&lt;INavigationService&gt;() call inside Bootstrap() throws
-        /// DependencyResolutionException ("Cannot resolve parameter 'Autofac.IContainer container'"),
-        /// and App.Application_Startup dies on the same line before MainWindow is ever shown.
-        ///
-        /// The fix belongs in the Desktop project, so this test pins the behaviour rather than
-        /// hiding it. When the registration is fixed this test fails — that is the intent: it is the
-        /// signal to delete it, at which point the ignored tests below become the real coverage.
+        /// The regression guard for the startup crash. NavigationService's constructor must take a
+        /// service Autofac actually supplies: ContainerBuilder.Build adds exactly one
+        /// self-registration, exposing ILifetimeScope and IComponentContext and nothing else. When it
+        /// took IContainer, this threw DependencyResolutionException ("Cannot resolve parameter
+        /// 'Autofac.IContainer container'") and App.Application_Startup died on that line before
+        /// MainWindow was ever shown.
         /// </summary>
         [Test]
-        public void Bootstrap_FailsBecauseAutofacDoesNotSelfRegisterIContainer()
+        public void Bootstrap_BuildsTheObjectGraphWithoutThrowing()
         {
-            Assert.That(_bootstrapFailure, Is.InstanceOf<DependencyResolutionException>());
-            Assert.That(_bootstrapFailure.ToString(), Does.Contain("Autofac.IContainer"));
-            Assert.That(_bootstrapFailure.ToString(), Does.Contain("NavigationService"));
+            Assert.That(_container, Is.Not.Null);
         }
 
         #endregion
@@ -128,7 +97,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void Resolve_MainWindowViewModel_Succeeds()
         {
-            var container = RequireContainer();
+            var container = _container;
 
             Assert.That(container.Resolve<MainWindowViewModel>(), Is.Not.Null);
         }
@@ -136,7 +105,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void Resolve_MainHomePageViewModel_Succeeds()
         {
-            var container = RequireContainer();
+            var container = _container;
 
             Assert.That(container.Resolve<MainHomePageViewModel>(), Is.Not.Null);
         }
@@ -144,7 +113,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void Resolve_InventoryHomePageViewModel_Succeeds()
         {
-            var container = RequireContainer();
+            var container = _container;
 
             Assert.That(container.Resolve<InventoryHomePageViewModel>(), Is.Not.Null);
         }
@@ -152,7 +121,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void Resolve_NavigationService_ReturnsTheConcreteNavigationService()
         {
-            var container = RequireContainer();
+            var container = _container;
 
             // The registration is RegisterType<NavigationService>().As<INavigationService>(), so the
             // interface is the only service exposed and the concrete type must arrive behind it.
@@ -162,7 +131,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void NavigationService_IsRegisteredAsASingleton()
         {
-            var container = RequireContainer();
+            var container = _container;
 
             // SingleInstance() in the bootstrapper is load-bearing: Bootstrap() hands one instance to
             // NavigationConfiguration.RegisterPages, and MainWindow resolves INavigationService for
@@ -174,7 +143,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void ViewModels_AreRegisteredPerDependency()
         {
-            var container = RequireContainer();
+            var container = _container;
 
             // No lifetime is specified for the view models, so Autofac's default — a new instance per
             // resolve — applies. Pinned because navigating twice to a page must not reuse its state.
@@ -186,7 +155,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void MainWindow_IsRegistered()
         {
-            var container = RequireContainer();
+            var container = _container;
 
             // Registration only, deliberately. MainWindow is a MetroWindow whose XAML pulls the
             // MahApps/MaterialDesign dictionaries declared in App.xaml, so resolving it without a
@@ -206,7 +175,7 @@ namespace AutoLotManager.Tests
         [TestCase("About")]
         public void BootstrappedNavigationService_NavigatesToEachDocumentedKey(string pageKey)
         {
-            var container = RequireContainer();
+            var container = _container;
             var navigationService = container.Resolve<INavigationService>();
 
             // End to end: Bootstrap() registered the pages on this very instance, so a Page coming
@@ -219,7 +188,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void BootstrappedNavigationService_UnknownKey_ThrowsInvalidOperationException()
         {
-            var container = RequireContainer();
+            var container = _container;
             var navigationService = container.Resolve<INavigationService>();
 
             // MainWindow catches InvalidOperationException around NavigateTo, so this type is the
@@ -232,7 +201,7 @@ namespace AutoLotManager.Tests
         [Test]
         public void BootstrappedNavigationService_ResolvesARegisteredViewModelIntoTheDataContext()
         {
-            var container = RequireContainer();
+            var container = _container;
             var navigationService = container.Resolve<INavigationService>();
 
             // The container-backed half of navigation: with a container present, NavigateTo resolves
