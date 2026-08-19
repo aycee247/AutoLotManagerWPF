@@ -1,0 +1,359 @@
+# EditorConfig for AutoLotManagerWPF
+# https://editorconfig.org
+#
+# These rules describe the conventions this codebase already follows; they were
+# derived by reading the existing sources rather than copied from a template.
+# The point is that the IDE enforces formatting so review comments do not have to.
+#
+# Style rules below are deliberately set to `suggestion` or `silent`: they surface
+# as IDE hints, not as build warnings, so nothing here can fail CI. (The Desktop
+# project is a legacy non-SDK csproj and ignores analyzer configuration entirely;
+# the three SDK-style projects only apply these at build time when
+# EnforceCodeStyleInBuild is turned on, which it is not.)
+
+root = true
+
+###############################################################################
+# All files
+###############################################################################
+[*]
+indent_style = space
+indent_size = 4
+tab_width = 4
+# This is a Windows / Visual Studio solution and is only buildable on Windows.
+# .gitattributes uses `* text=auto`, so git stores LF and hands Windows working
+# copies CRLF; declaring crlf here keeps editors from fighting that round trip.
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+# `charset` is deliberately NOT set globally. Encoding in this repo is mixed:
+# everything Visual Studio generated is UTF-8 with a BOM, while the files added
+# later by hand (Desktop/Navigation/*.cs, all of AutoLotManager.Tests) have none.
+# Declaring either one repo-wide would make editors rewrite the other group's
+# files on first save, for no benefit. It is set below only for the file types
+# that are consistent today.
+
+###############################################################################
+# C# source
+#
+# No `charset` here on purpose — see the note in the [*] section. Both BOM and
+# BOM-less .cs files exist; leaving it unset lets editors preserve whatever each
+# file already has instead of churning it. Everything is UTF-8 either way.
+###############################################################################
+[*.cs]
+indent_size = 4
+
+#### using directives ####
+
+# Usings are ordered case-insensitively but System is NOT hoisted to the top:
+# Desktop files open with `using Autofac;` / `using AutoLotManager.*;` before
+# `using System;`. Keep that rather than churning every file.
+dotnet_sort_system_directives_first = false
+dotnet_separate_import_directive_groups = false
+csharp_using_directive_placement = outside_namespace:suggestion
+
+#### Language keywords vs. BCL type names ####
+
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+#### `this.` qualification — not used anywhere in this codebase ####
+
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+#### Modifiers ####
+
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
+dotnet_style_readonly_field = true:suggestion
+
+#### Expression-level preferences ####
+
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_compound_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:silent
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:silent
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:silent
+
+#### `var` ####
+
+# The codebase uses `var` where the right-hand side already names the type
+# (`var builder = new ContainerBuilder();`, `var page = (Page)Activator...`)
+# and spells the type out otherwise.
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:silent
+
+#### Expression-bodied members ####
+
+# This codebase writes block bodies, including simple property accessors
+# (`get { return _value; }`). Do not nudge toward `=>`.
+csharp_style_expression_bodied_methods = false:silent
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_operators = false:silent
+csharp_style_expression_bodied_properties = false:silent
+csharp_style_expression_bodied_indexers = false:silent
+csharp_style_expression_bodied_accessors = false:silent
+csharp_style_expression_bodied_local_functions = false:silent
+csharp_style_expression_bodied_lambdas = true:silent
+
+#### Pattern matching and modern C# ####
+# The solution builds with the default language version for net472 /
+# netstandard2.0 (C# 7.3), so index/range operators are not available.
+
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+csharp_prefer_simple_default_expression = true:suggestion
+csharp_style_conditional_delegate_call = true:suggestion
+csharp_style_throw_expression = true:silent
+csharp_style_deconstructed_variable_declaration = true:silent
+csharp_prefer_static_local_function = true:silent
+csharp_style_prefer_index_operator = false:silent
+csharp_style_prefer_range_operator = false:silent
+csharp_style_namespace_declarations = block_scoped:suggestion
+
+#### Braces — Allman, and always braced ####
+
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+
+# Brace every `if`, including single-statement guard clauses — the style used by
+# NavigationService's argument checks. One pre-existing exception survives in
+# MainWindow.xaml.cs; the IDE will now flag it.
+csharp_prefer_braces = true:suggestion
+
+#### Indentation ####
+
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = false
+csharp_indent_switch_labels = true
+csharp_indent_labels = one_less_than_current
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+
+#### Spacing ####
+
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_before_comma = false
+csharp_space_after_comma = true
+csharp_space_before_dot = false
+csharp_space_after_dot = false
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_around_declaration_statements = false
+csharp_space_before_open_square_brackets = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_square_brackets = false
+
+#### Wrapping ####
+
+csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = true
+
+#### Unnecessary code ####
+
+dotnet_code_quality_unused_parameters = all:suggestion
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent
+
+###############################################################################
+# Naming conventions
+#
+# Observed: `_camelCase` private instance fields (`_container`, `_pageRegistrations`),
+# `PascalCase` for everything public, `camelCase` parameters and locals,
+# `I`-prefixed interfaces (`INavigationService`).
+###############################################################################
+
+# --- Symbol groups ---
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+
+dotnet_naming_symbols.types.applicable_kinds = class,struct,enum,delegate
+dotnet_naming_symbols.types.applicable_accessibilities = *
+
+dotnet_naming_symbols.non_field_members.applicable_kinds = property,method,event
+dotnet_naming_symbols.non_field_members.applicable_accessibilities = *
+
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.applicable_accessibilities = *
+dotnet_naming_symbols.constants.required_modifiers = const
+
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private,private_protected
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private,private_protected
+
+dotnet_naming_symbols.non_private_fields.applicable_kinds = field
+dotnet_naming_symbols.non_private_fields.applicable_accessibilities = public,internal,protected,protected_internal
+
+dotnet_naming_symbols.parameters_and_locals.applicable_kinds = parameter,local
+
+dotnet_naming_symbols.type_parameters.applicable_kinds = type_parameter
+
+# --- Styles ---
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+
+dotnet_naming_style.i_prefixed_pascal_case.required_prefix = I
+dotnet_naming_style.i_prefixed_pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.t_prefixed_pascal_case.required_prefix = T
+dotnet_naming_style.t_prefixed_pascal_case.capitalization = pascal_case
+
+# --- Rules (the first matching rule wins, so the specific ones come first) ---
+dotnet_naming_rule.interfaces_are_i_prefixed.symbols = interfaces
+dotnet_naming_rule.interfaces_are_i_prefixed.style = i_prefixed_pascal_case
+dotnet_naming_rule.interfaces_are_i_prefixed.severity = suggestion
+
+dotnet_naming_rule.type_parameters_are_t_prefixed.symbols = type_parameters
+dotnet_naming_rule.type_parameters_are_t_prefixed.style = t_prefixed_pascal_case
+dotnet_naming_rule.type_parameters_are_t_prefixed.severity = suggestion
+
+dotnet_naming_rule.constants_are_pascal_case.symbols = constants
+dotnet_naming_rule.constants_are_pascal_case.style = pascal_case
+dotnet_naming_rule.constants_are_pascal_case.severity = suggestion
+
+dotnet_naming_rule.private_static_fields_are_underscore_camel_case.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_are_underscore_camel_case.style = underscore_camel_case
+dotnet_naming_rule.private_static_fields_are_underscore_camel_case.severity = suggestion
+
+dotnet_naming_rule.private_fields_are_underscore_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_are_underscore_camel_case.style = underscore_camel_case
+dotnet_naming_rule.private_fields_are_underscore_camel_case.severity = suggestion
+
+dotnet_naming_rule.non_private_fields_are_pascal_case.symbols = non_private_fields
+dotnet_naming_rule.non_private_fields_are_pascal_case.style = pascal_case
+dotnet_naming_rule.non_private_fields_are_pascal_case.severity = suggestion
+
+dotnet_naming_rule.non_field_members_are_pascal_case.symbols = non_field_members
+dotnet_naming_rule.non_field_members_are_pascal_case.style = pascal_case
+dotnet_naming_rule.non_field_members_are_pascal_case.severity = suggestion
+
+dotnet_naming_rule.types_are_pascal_case.symbols = types
+dotnet_naming_rule.types_are_pascal_case.style = pascal_case
+dotnet_naming_rule.types_are_pascal_case.severity = suggestion
+
+dotnet_naming_rule.parameters_and_locals_are_camel_case.symbols = parameters_and_locals
+dotnet_naming_rule.parameters_and_locals_are_camel_case.style = camel_case
+dotnet_naming_rule.parameters_and_locals_are_camel_case.severity = suggestion
+
+###############################################################################
+# Generated code
+#
+# Properties\Resources.Designer.cs and Settings.Designer.cs are regenerated by
+# Visual Studio; style rules must not produce noise in them.
+###############################################################################
+[*.Designer.cs]
+generated_code = true
+
+###############################################################################
+# XAML
+#
+# Views are 4-space indented and, like the .cs files, are written by Visual
+# Studio with a BOM. Attributes are commonly aligned one per line under the
+# element (see MainWindow.xaml) — that alignment is a manual choice, not
+# something EditorConfig expresses.
+###############################################################################
+[*.xaml]
+indent_size = 4
+charset = utf-8-bom
+
+###############################################################################
+# MSBuild projects and XML
+#
+# All four csproj files use 2-space indentation. Only the legacy Desktop csproj
+# (and the VS-managed config/resx files beside it) carries a BOM; the three
+# SDK-style projects do not, so the BOM setting is scoped to that folder.
+###############################################################################
+[*.{csproj,proj,projitems,shproj,props,targets,ruleset,resx,settings,nuspec,xml,config}]
+indent_size = 2
+
+[AutoLotManager.Desktop/*.{csproj,config}]
+charset = utf-8-bom
+
+[AutoLotManager.Desktop/Properties/*.{resx,settings}]
+charset = utf-8-bom
+
+# packages.config and App.config are entirely VS/NuGet managed; leave them be.
+[AutoLotManager.Desktop/{packages.config,App.config}]
+trim_trailing_whitespace = false
+
+###############################################################################
+# Solution file — Visual Studio writes tabs, CRLF, and a BOM. Do not fight it.
+###############################################################################
+[*.sln]
+indent_style = tab
+end_of_line = crlf
+charset = utf-8-bom
+
+###############################################################################
+# JSON
+###############################################################################
+[*.{json,json5,jsonc,webmanifest}]
+indent_size = 2
+charset = utf-8
+
+###############################################################################
+# YAML — the GitHub Actions workflows under .github/workflows.
+# YAML forbids tabs, and 2-space indentation is what build.yml already uses.
+###############################################################################
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+charset = utf-8
+
+###############################################################################
+# Markdown
+#
+# Trailing whitespace is significant in Markdown (two spaces = hard line break),
+# so trimming is disabled here.
+###############################################################################
+[*.md]
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = false
+
+###############################################################################
+# Scripts
+###############################################################################
+[*.{ps1,psm1,psd1}]
+indent_size = 4
+end_of_line = crlf
+
+[*.sh]
+indent_size = 2
+end_of_line = lf
