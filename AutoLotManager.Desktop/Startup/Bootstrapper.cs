@@ -29,10 +29,20 @@ namespace AutoLotManager.Desktop.Startup
             builder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
 
             var container = builder.Build();
-            
-            // Configure navigation registrations
-            var navigationService = container.Resolve<INavigationService>();
-            NavigationConfiguration.RegisterPages(navigationService);
+
+            // Configure navigation registrations. If anything here throws, the container built above
+            // would otherwise be abandoned without being disposed, leaking whatever it had already
+            // created — so dispose it before letting the exception reach Application_Startup.
+            try
+            {
+                var navigationService = container.Resolve<INavigationService>();
+                NavigationConfiguration.RegisterPages(navigationService);
+            }
+            catch
+            {
+                container.Dispose();
+                throw;
+            }
 
             return container;
         }
