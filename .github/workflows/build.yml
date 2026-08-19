@@ -62,9 +62,20 @@ jobs:
       - name: Build
         run: msbuild AutoLotManager.sln /p:Configuration=${{ matrix.configuration }} /m /nologo /v:minimal
 
-      # No test project exists yet — issue #17 adds one. Once it does, run it here, e.g.:
-      #   - name: Test
-      #     run: vstest.console.exe **\bin\${{ matrix.configuration }}\*Tests.dll
+      # vstest.console runs the already-built net472 assembly. `dotnet test` is not used
+      # here: it would want to build the test project itself, and that pulls in the legacy
+      # WPF Desktop project, which the dotnet CLI cannot build.
+      - name: Test
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vstest = & $vswhere -latest -products * -find "**\TestPlatform\vstest.console.exe" |
+            Select-Object -First 1
+          if (-not $vstest) { throw "vstest.console.exe not found via vswhere" }
+          $assembly = "AutoLotManager.Tests\bin\${{ matrix.configuration }}\net472\AutoLotManager.Tests.dll"
+          if (-not (Test-Path $assembly)) { throw "Test assembly not found at $assembly" }
+          & $vstest $assembly
+          exit $LASTEXITCODE
 
       - name: Upload build output
         if: matrix.configuration == 'Release'

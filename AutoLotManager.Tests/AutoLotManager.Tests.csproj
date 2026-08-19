@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- net472 to match AutoLotManager.Desktop: NavigationService returns a WPF Page,
+         so the tests need the same framework the Desktop project builds against. -->
+    <TargetFramework>net472</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <!-- The ProjectReference to AutoLotManager.Desktop drags in that app's whole dependency
+         closure. Desktop/App.config carries binding redirects for System.ValueTuple and
+         System.Windows.Interactivity because that closure needs them; without generating the
+         equivalent AutoLotManager.Tests.dll.config, any test reaching those assemblies fails
+         with FileLoadException at run time rather than at build time. -->
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <!-- NavigationService's constructor takes an Autofac.IContainer, so the signature
+         has to resolve here even though the tests pass null. Version matches the one
+         the Desktop project pins in packages.config. -->
+    <PackageReference Include="Autofac" Version="5.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WPF reference assemblies: System.Windows.Controls.Page and DependencyObject. -->
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AutoLotManager.Core\AutoLotManager.Core.csproj" />
+    <ProjectReference Include="..\AutoLotManager.ViewModel\AutoLotManager.ViewModel.csproj" />
+    <ProjectReference Include="..\AutoLotManager.Desktop\AutoLotManager.Desktop.csproj" />
+  </ItemGroup>
+
+</Project>

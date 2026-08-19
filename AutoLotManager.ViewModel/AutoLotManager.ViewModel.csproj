@@ -9,13 +9,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- This project targets netstandard2.0 and must stay free of WPF/UI dependencies.
+         The Syncfusion WPF packages were referenced here but never used by any type in
+         this assembly, and had no netstandard2.0 assets, so NuGet fell back to .NET
+         Framework ones and warned (NU1701) on every build. The Desktop project keeps
+         its own Syncfusion references via packages.config. See issue #39. -->
     <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
-    <PackageReference Include="Syncfusion.DataGridExcelExport.Wpf" Version="20.4.0.54" />
-    <PackageReference Include="Syncfusion.Licensing" Version="20.4.0.54" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="20.4.0.54" />
-    <PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="20.4.0.54" />
-    <PackageReference Include="Syncfusion.Shared.WPF" Version="20.4.0.54" />
   </ItemGroup>
 
   <ItemGroup>
