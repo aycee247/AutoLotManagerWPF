@@ -5,6 +5,13 @@
          so the tests need the same framework the Desktop project builds against. -->
     <TargetFramework>net472</TargetFramework>
     <IsPackable>false</IsPackable>
+    <!-- The ProjectReference to AutoLotManager.Desktop drags in that app's whole dependency
+         closure. Desktop/App.config carries binding redirects for System.ValueTuple and
+         System.Windows.Interactivity because that closure needs them; without generating the
+         equivalent AutoLotManager.Tests.dll.config, any test reaching those assemblies fails
+         with FileLoadException at run time rather than at build time. -->
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <ItemGroup>

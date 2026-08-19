@@ -68,7 +68,7 @@ Software to manage a fictional car lot using WPF, XAML, C#, Autofac, Prism, and 
 
 ### Solution Structure
 
-The solution is organized into three main projects:
+The solution is organized into four projects:
 
 1. **AutoLotManager.Core**: Domain models and business logic
    - Contains the `Car` entity and core domain types
@@ -84,6 +84,11 @@ The solution is organized into three main projects:
    - Navigation infrastructure (INavigationService, NavigationService)
    - Startup and bootstrapping logic
    - Material Design UI components
+
+4. **AutoLotManager.Tests**: NUnit test project
+   - Unit tests for the navigation service and ViewModels
+   - Targets net472 to match the Desktop project, since navigation returns a WPF `Page`
+   - Run automatically by CI on every pull request
 
 ### Navigation Architecture
 
@@ -164,6 +169,12 @@ AutoLotManagerWPF/
 │   │   └── Settings/
 │   └── AutoLotManager.Desktop.csproj
 │
+├── AutoLotManager.Tests/             # NUnit test project
+│   ├── NavigationServiceTests.cs     # Navigation registration and behaviour
+│   ├── ViewModelTests.cs             # ViewModelBase and MainWindowViewModel
+│   ├── TestDoubles.cs                # Minimal Page/ViewModel stand-ins
+│   └── AutoLotManager.Tests.csproj
+│
 ├── README.md                         # This file
 ├── NAVIGATION.md                     # Navigation system documentation
 ├── NAVIGATION_EXAMPLE.md             # Step-by-step navigation guide
@@ -184,10 +195,13 @@ Additional documentation is available in the following files:
 To add a new page to the application:
 
 1. Create the Page (View) in `AutoLotManager.Desktop/Pages/`
-2. Create the ViewModel in `AutoLotManager.ViewModel/Pages/`
-3. Register the ViewModel in `Bootstrapper.cs`
-4. Register the page in `NavigationConfiguration.cs`
-5. Add a menu item in `MainWindow.xaml`
+2. Add the new `.xaml` and `.xaml.cs` to `AutoLotManager.Desktop.csproj` — it is a legacy
+   (non-SDK) project and does not pick up files automatically, so a file that is not listed
+   there simply will not compile into the application
+3. Create the ViewModel in `AutoLotManager.ViewModel/Pages/` (SDK-style, no project edit needed)
+4. Register the ViewModel in `Bootstrapper.cs`
+5. Register the page in `NavigationConfiguration.cs`
+6. Add a menu item in `MainWindow.xaml` whose `Label` matches the registered key
 
 See [NAVIGATION_EXAMPLE.md](NAVIGATION_EXAMPLE.md) for a complete walkthrough.
 
@@ -213,7 +227,7 @@ Each item below is tracked as a GitHub issue — follow the link for scope and i
 - [ ] **Responsive Design** ([#16](https://github.com/aycee247/AutoLotManagerWPF/issues/16)): Better layout adaptation for different screen sizes
 
 #### Technical Improvements
-- [ ] **Unit Tests** ([#17](https://github.com/aycee247/AutoLotManagerWPF/issues/17)): Comprehensive test coverage for ViewModels and business logic
+- [x] **Unit Tests** ([#17](https://github.com/aycee247/AutoLotManagerWPF/issues/17)): Comprehensive test coverage for ViewModels and business logic
 - [ ] **Integration Tests** ([#18](https://github.com/aycee247/AutoLotManagerWPF/issues/18)): End-to-end testing of key workflows
 - [ ] **Logging Framework** ([#19](https://github.com/aycee247/AutoLotManagerWPF/issues/19)): Implement structured logging (Serilog, NLog)
 - [ ] **Error Handling** ([#20](https://github.com/aycee247/AutoLotManagerWPF/issues/20)): Global exception handling and user-friendly error messages
@@ -222,7 +236,7 @@ Each item below is tracked as a GitHub issue — follow the link for scope and i
 - [ ] **Authentication & Authorization** ([#23](https://github.com/aycee247/AutoLotManagerWPF/issues/23)): User login and role-based access control
 
 #### Developer Experience
-- [ ] **CI/CD Pipeline** ([#24](https://github.com/aycee247/AutoLotManagerWPF/issues/24)): Automated build, test, and deployment
+- [x] **CI/CD Pipeline** ([#24](https://github.com/aycee247/AutoLotManagerWPF/issues/24)): Automated build, test, and deployment
 - [ ] **Code Documentation** ([#25](https://github.com/aycee247/AutoLotManagerWPF/issues/25)): XML documentation comments for all public APIs
 - [ ] **Style Guide** ([#26](https://github.com/aycee247/AutoLotManagerWPF/issues/26)): Coding standards and conventions document
 - [ ] **Docker Support** ([#27](https://github.com/aycee247/AutoLotManagerWPF/issues/27)): Containerization for easier development and deployment
