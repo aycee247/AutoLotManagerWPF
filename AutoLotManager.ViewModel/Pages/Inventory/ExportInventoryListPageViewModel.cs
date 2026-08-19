@@ -7,8 +7,26 @@ using System.Text;
 
 namespace AutoLotManager.ViewModel.Pages.Inventory
 {
+    /// <summary>
+    /// View model behind the "export inventory list" page. It holds the list of
+    /// vehicles the page is meant to display and export; the export action
+    /// itself is not implemented here.
+    /// </summary>
     public class ExportInventoryListPageViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Creates the view model and fills <see cref="Cars"/>.
+        /// </summary>
+        /// <remarks>
+        /// No real inventory source is wired up yet, so the constructor
+        /// generates 1000 fake <see cref="Car"/> records with Bogus. That work
+        /// runs synchronously on the constructing thread and produces random
+        /// placeholder data unrelated to the records held by
+        /// <see cref="AutoLotManager.ViewModel.MainWindowViewModel"/>.
+        /// Nothing constructs this view model at present: the export page is
+        /// not registered with the navigation service and its code-behind never
+        /// sets a DataContext, so the cost is not currently paid at runtime.
+        /// </remarks>
         public ExportInventoryListPageViewModel()
         {
             Cars = new ObservableCollection<Car>();
@@ -28,6 +46,13 @@ namespace AutoLotManager.ViewModel.Pages.Inventory
 
         private ObservableCollection<Car> _cars;
 
+        /// <summary>
+        /// The vehicles the export page is meant to list. Populated in the
+        /// constructor with 1000 randomly generated placeholder records;
+        /// replacing the whole collection raises a change notification so the
+        /// view rebinds. The page's grid binds to this name, but the binding is
+        /// inert until something makes this view model the page's DataContext.
+        /// </summary>
         public ObservableCollection<Car> Cars
         {
             get
