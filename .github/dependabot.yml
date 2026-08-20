@@ -26,3 +26,27 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: deps
+    # Version-locked families must be bumped together or not at all. Without these groups
+    # Dependabot opens one PR per package, and coupled packages then block each other
+    # permanently: PR #55 (MahApps 2.1.1 -> 2.4.11) failed with
+    #   error MC1000: Cannot resolve dependency to assembly
+    #   'Microsoft.Windows.Design.Extensibility, Version=4.3.1.0'
+    # because that assembly version comes from ControlzEx 4.3.1, which MahApps 2.4.11 has
+    # outgrown — while PR #54 (ControlzEx 4.3.1 -> 7.0.4) failed from the other side, because
+    # MahApps 2.1.1 requires ControlzEx 4.x. Neither could ever go green alone.
+    groups:
+      mahapps:
+        patterns:
+          - MahApps.Metro*
+          - ControlzEx
+      material-design:
+        patterns:
+          - MaterialDesign*
+      syncfusion:
+        # All Syncfusion packages share a single version stream (20.4.0.54 today); mixing
+        # versions across them is not supported.
+        patterns:
+          - Syncfusion.*
+      prism:
+        patterns:
+          - Prism.*
