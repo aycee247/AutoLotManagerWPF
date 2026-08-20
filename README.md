@@ -140,6 +140,9 @@ For detailed information, see [NAVIGATION.md](NAVIGATION.md) and [NAVIGATION_EXA
 AutoLotManagerWPF/
 ├── AutoLotManager.Core/              # Domain models and business logic
 │   ├── Car.cs                        # Car entity model
+│   ├── Navigation/                   # UI-free navigation seam for ViewModels
+│   │   ├── IPageNavigator.cs
+│   │   └── PageNavigator.cs
 │   └── AutoLotManager.Core.csproj
 │
 ├── AutoLotManager.ViewModel/         # ViewModels and presentation logic
@@ -175,6 +178,9 @@ AutoLotManagerWPF/
 │   ├── TestDoubles.cs                # Minimal Page/ViewModel stand-ins
 │   └── AutoLotManager.Tests.csproj
 │
+├── CLAUDE.md                         # Guidance for Claude Code, incl. doc upkeep
+├── CONTRIBUTING.md                   # Build, style, branching and PR flow
+├── docs/adr/                         # Architecture decision records
 ├── README.md                         # This file
 ├── NAVIGATION.md                     # Navigation system documentation
 ├── NAVIGATION_EXAMPLE.md             # Step-by-step navigation guide

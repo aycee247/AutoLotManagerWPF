@@ -1,9 +1,6 @@
-﻿using AutoLotManager.Core;
-using Bogus;
-using Prism.Commands;
+﻿using Prism.Commands;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 using System.Windows.Input;
@@ -12,13 +9,16 @@ namespace AutoLotManager.ViewModel
 {
     /// <summary>
     /// View model for the application's main window. It owns the window title,
-    /// the busy indicator, the currently selected navigation menu item, a
-    /// collection of vehicles, and the commands the window's chrome invokes.
+    /// the busy indicator, the currently selected navigation menu item, and the
+    /// commands the window's chrome invokes.
     /// </summary>
     /// <remarks>
-    /// Because pages hosted in the window's frame inherit this DataContext
-    /// until navigation replaces it, several of these members are also the
-    /// binding targets for page-level controls, not just the window's own.
+    /// Pages hosted in the window's frame inherit this DataContext until
+    /// navigation replaces it with the page's own view model. Pages must not
+    /// rely on that inheritance: binding a page control to a member of this
+    /// class works only until the user navigates to that page, at which point
+    /// the binding silently stops resolving. Page controls bind to members of
+    /// the page's own view model instead.
     /// </remarks>
     public class MainWindowViewModel : ViewModelBase
     {
@@ -29,16 +29,14 @@ namespace AutoLotManager.ViewModel
         #region Constructors
         // TODO: setup dependency injection, logging, data service, etc.
         /// <summary>
-        /// Creates the main window view model, wiring up its commands and
-        /// populating <see cref="Cars"/>.
+        /// Creates the main window view model and wires up its commands.
         /// </summary>
         /// <remarks>
-        /// There is no real data source yet: the constructor synchronously
-        /// generates 1000 fake <see cref="Car"/> records with Bogus and adds
-        /// them to <see cref="Cars"/>. That work happens on whichever thread
-        /// constructs the view model, typically the UI thread, so construction
-        /// is measurably slower than a trivial view model's and the data is
-        /// random placeholder content rather than real inventory.
+        /// This constructor previously generated 1000 fake vehicle records with
+        /// Bogus on the constructing thread. Nothing displayed them — the only
+        /// grid bound to that collection is commented out in MainWindow.xaml —
+        /// so the work was removed. Real inventory arrives with the repository
+        /// in issue #72.
         /// </remarks>
         public MainWindowViewModel()
             : base()
@@ -46,20 +44,6 @@ namespace AutoLotManager.ViewModel
             WindowLoadedCommand = new DelegateCommand(WindowLoaded);
             ProgressTileClickedCommand = new DelegateCommand(ProgressTileClicked);
             GithubIconClickedCommand = new DelegateCommand(GithubIconClicked);
-
-            Cars = new ObservableCollection<Car>();
-            var cars = new Faker<Car>()
-                .RuleFor(c => c.Vin, a => a.Vehicle.Vin())
-                .RuleFor(c => c.Make, a => a.Vehicle.Manufacturer())
-                .RuleFor(c => c.Model, a => a.Vehicle.Model())
-                .RuleFor(c => c.Year, a => a.Random.Number(1980, 2024))
-                .RuleFor(c => c.Color, a => a.Commerce.Color());
-
-            for (int i = 0; i < 1000; i++)
-            {
-                var car = cars.Generate();
-                Cars.Add(car);
-            };
         }
         #endregion
 
@@ -113,8 +97,10 @@ namespace AutoLotManager.ViewModel
         /// </summary>
         /// <remarks>
         /// Effectively write-only today: the menu's SelectedItem binding pushes
-        /// values in, but no code reads the property back. The window's item
-        /// click handler goes to the control's own SelectedItem instead.
+        /// values in, but no code reads the property back. Since issue #66 the
+        /// window's click handlers use the item that was actually clicked
+        /// (ItemClickEventArgs.ClickedItem) rather than any selection state, so
+        /// nothing consults this property at all.
         /// </remarks>
         public object SelectedMenuItem
         {
@@ -130,31 +116,6 @@ namespace AutoLotManager.ViewModel
         }
 
 
-        private ObservableCollection<Car> _cars;
-
-        /// <summary>
-        /// The vehicles held by the main window, populated in the constructor
-        /// with 1000 randomly generated placeholder records rather than data
-        /// from a real inventory source.
-        /// </summary>
-        /// <remarks>
-        /// Nothing currently displays this collection: the only view that ever
-        /// bound to it, a DataGrid in MainWindow.xaml, is commented out. The
-        /// records are still generated on every startup, so the cost is paid
-        /// even though the data is never shown.
-        /// </remarks>
-        public ObservableCollection<Car> Cars
-        {
-            get
-            {
-                return _cars;
-            }
-            set
-            {
-                _cars = value;
-                OnPropertyChanged();
-            }
-        }
         #endregion
 
         #region ICommands
@@ -165,14 +126,15 @@ namespace AutoLotManager.ViewModel
         public ICommand WindowLoadedCommand { get; }
 
         /// <summary>
-        /// Command bound to the tiles on the home and tiles-demo pages. Each
-        /// execution flips <see cref="DisplayProgressRing"/>, showing or hiding
-        /// the progress ring; it does not start any actual work.
+        /// Flips <see cref="DisplayProgressRing"/>, showing or hiding the window's progress
+        /// ring; it does not start any actual work.
         /// </summary>
         /// <remarks>
-        /// Those pages reach this command only while they are still inheriting
-        /// the main window's DataContext. Once navigation assigns a page its own
-        /// view model, the binding no longer resolves and the tiles do nothing.
+        /// Bound to the tiles on TilesDefaultPage. The home page no longer binds here: since
+        /// issue #65 its tiles bind to the identically named command on
+        /// <c>MainHomePageViewModel</c>, which the navigation service assigns as that page's
+        /// DataContext. Relying on a page inheriting this window's DataContext is what made
+        /// those tiles stop working, so do not bind a new page to this command.
         /// </remarks>
         public ICommand ProgressTileClickedCommand { get; }
 

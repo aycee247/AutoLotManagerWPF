@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using AutoLotManager.Core.Navigation;
 using AutoLotManager.Desktop.Navigation;
 using AutoLotManager.ViewModel;
 using AutoLotManager.ViewModel.Pages.Inventory;
@@ -24,6 +25,11 @@ namespace AutoLotManager.Desktop.Startup
             // Register view models
             builder.RegisterType<MainHomePageViewModel>().AsSelf();
             builder.RegisterType<InventoryHomePageViewModel>().AsSelf();
+            builder.RegisterType<ExportInventoryListPageViewModel>().AsSelf();
+
+            // Singleton: the view models raising navigation requests and the shell handling
+            // them must share one instance, or the shell never hears the request.
+            builder.RegisterType<PageNavigator>().As<IPageNavigator>().SingleInstance();
             
             // Register navigation service
             builder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();

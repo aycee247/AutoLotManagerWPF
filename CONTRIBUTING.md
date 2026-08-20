@@ -234,20 +234,24 @@ a hypothetical "Reports" page:
    must match the string passed to `RegisterPage`. The lookup is case-insensitive,
    but keep the two identical anyway.
 
-   > **Use `ItemsSource`, not `OptionsItemsSource`.** Only `ItemClick` is wired up
-   > (`MainWindow.xaml`), and the handler reads `SelectedItem` — options items land
-   > in `SelectedOptionsItem` and never reach the handler at all. An item placed in
-   > `OptionsItemsSource` is therefore dead: clicking it does nothing. The existing
-   > "About" entry is exactly this case today.
+   > **Either `ItemsSource` or `OptionsItemsSource` works.** Both `ItemClick` and
+   > `OptionsItemClick` are wired in `MainWindow.xaml`, and both handlers route
+   > through one path that reads `args.ClickedItem` — the item actually clicked,
+   > rather than whatever happens to be selected. Before issue #66 only `ItemClick`
+   > was wired and it read `SelectedItem`, which an options click never sets, so the
+   > "About" entry was dead: clicking it did nothing. If you add a new handler, use
+   > `ClickedItem` for the same reason.
 
 Steps 5 and 6 are two halves of the same fact. Change one, change the other.
 
 ### When navigation appears to do nothing
 
-`hmcLeftMenu_ItemClick` catches `InvalidOperationException` and `ArgumentException`
-and only writes them to `Debug.WriteLine` — there is a `TODO` about surfacing them
-to the user. So a `Label` that does not match any `RegisterPage` key produces a
-click that visibly does nothing, with the real message
+`MainWindow.NavigateTo` — which both menu handlers and view-model-initiated
+navigation funnel through — catches `InvalidOperationException`, `ArgumentException`
+and `TargetInvocationException`, and only writes them to `Debug.WriteLine`; there is
+a `TODO` about surfacing them to the user (issue #92). So a `Label` that does not
+match any `RegisterPage` key produces a click that visibly does nothing, with the
+real message
 (`Page 'X' is not registered`) visible only in the debugger's Output window. If a
 new menu item does nothing when clicked, check the Output window first, then check
 for a `Label`/`RegisterPage` typo, then check that the item is under `ItemsSource`.
@@ -338,13 +342,30 @@ The conventions, in prose:
 
 ## Commit and PR flow
 
+This project uses **trunk-based development with short-lived branches**. `master` is
+the only long-lived branch and is always releasable. The full rationale is recorded in
+[`docs/adr/0001-branching-strategy.md`](docs/adr/0001-branching-strategy.md).
+
 1. **Branch off `master`.** Do not commit to `master` directly. If you do not have
    push access to this repository, fork it first and branch in your fork.
 
    ```powershell
    git fetch origin master
-   git checkout -b feature/my-change origin/master
+   git checkout -b fix/65-tile-click-commands origin/master
    ```
+
+   Name branches `<type>/<issue-number>-<short-slug>`, where type is one of
+   `feat`, `fix`, `docs`, `chore`, `spike` or `test`.
+
+   **One issue per branch by default.** A branch may cover several stories from the
+   same epic when they touch the same contended files — the Desktop `.csproj`,
+   `MainWindow.xaml`, `Bootstrapper.cs` and `NavigationConfiguration.cs` are the
+   usual reason. Splitting those across branches produces conflicts, not isolation.
+
+   **Keep branches short — hours or days, not weeks.** A branch that cannot merge
+   within about a week is too big and should be split. Long-lived side branches are
+   how this repository previously ended up with a compile error and a startup crash
+   sitting outside `master` for months.
 
 2. **Keep commits focused.** One logical change per commit; do not mix a refactor
    with a behaviour change.
@@ -369,3 +390,7 @@ The conventions, in prose:
    - [ ] Tests added or updated for new behaviour in `Core`, `ViewModel`, or
          `Navigation`.
    - [ ] No `bin/`, `obj/`, `packages/`, or `.vs/` artefacts in the diff.
+   - [ ] **Documentation describing what you changed has been updated in the same
+         PR** — see the table in [`CLAUDE.md`](CLAUDE.md) for which document covers
+         what. A stale document is worse than a missing one.
+   - [ ] The issue this branch closes is referenced, and its epic checklist ticked.

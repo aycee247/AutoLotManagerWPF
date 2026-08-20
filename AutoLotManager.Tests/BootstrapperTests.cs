@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Autofac;
+using AutoLotManager.Core.Navigation;
 using AutoLotManager.Desktop;
 using AutoLotManager.Desktop.Navigation;
 using AutoLotManager.Desktop.Pages;
@@ -39,7 +40,8 @@ namespace AutoLotManager.Tests
         {
             // One container for the fixture: Bootstrap() is itself under test and there is no reason
             // to repeat it per test, and sharing the result keeps the expensive resolves down to one
-            // each — MainWindowViewModel's constructor generates 1000 Bogus records.
+            // each. (MainWindowViewModel's 1000-record Bogus generation was removed in #68,
+            // but resolving the whole graph is still worth doing once rather than per test.)
             //
             // Deliberately not wrapped in a try/catch. If Bootstrap() throws, every test in the
             // fixture should fail with that exception: the object graph not building is precisely
@@ -119,6 +121,33 @@ namespace AutoLotManager.Tests
         }
 
         [Test]
+        public void Resolve_PageNavigator_Succeeds()
+        {
+            var container = _container;
+
+            // The view-model-facing navigation seam. Registered as a singleton because the
+            // view models raising requests and MainWindow handling them must share one
+            // instance — a per-dependency registration would mean the shell never hears them.
+            Assert.That(container.Resolve<IPageNavigator>(), Is.Not.Null);
+        }
+
+        [Test]
+        public void PageNavigator_IsRegisteredAsASingleton()
+        {
+            var container = _container;
+
+            Assert.That(container.Resolve<IPageNavigator>(), Is.SameAs(container.Resolve<IPageNavigator>()));
+        }
+
+        [Test]
+        public void Resolve_ExportInventoryListPageViewModel_Succeeds()
+        {
+            var container = _container;
+
+            Assert.That(container.Resolve<ExportInventoryListPageViewModel>(), Is.Not.Null);
+        }
+
+        [Test]
         public void Resolve_NavigationService_ReturnsTheConcreteNavigationService()
         {
             var container = _container;
@@ -161,8 +190,10 @@ namespace AutoLotManager.Tests
             // MahApps/MaterialDesign dictionaries declared in App.xaml, so resolving it without a
             // running Application throws for reasons that have nothing to do with the container. What
             // is worth pinning is that App.Application_Startup's Resolve<MainWindow>() would find a
-            // registration at all, and that its two dependencies — MainWindowViewModel and
-            // INavigationService — are resolvable, which the tests above cover.
+            // registration at all, and that its three dependencies — MainWindowViewModel,
+            // INavigationService and IPageNavigator — are resolvable, which the tests above cover.
+            // Keep this list in step with MainWindow's constructor: it is the only guide for
+            // keeping the #50 regression guard complete.
             Assert.That(container.IsRegistered<MainWindow>(), Is.True);
         }
 
@@ -247,6 +278,12 @@ namespace AutoLotManager.Tests
 
         [TestCase("Home")]
         [TestCase("Inventory")]
+        // Added in #65: reached from the inventory page's tiles rather than the menu. Like
+        // Home and Inventory these are real XAML pages, so the honest assertion is that the
+        // key resolves to *something* — an unregistered key is refused with
+        // InvalidOperationException before the page type is touched at all.
+        [TestCase("AddEditInventory")]
+        [TestCase("ExportInventoryList")]
         public void RegisterPages_KeysWhosePagesCannotBeConstructedInATestHost(string pageKey)
         {
             var navigationService = ConfiguredNavigationService();

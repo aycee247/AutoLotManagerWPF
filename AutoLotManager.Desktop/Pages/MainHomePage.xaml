@@ -85,5 +85,12 @@
                 <iconPacks:PackIconFontAwesome Kind="AddressBookRegular" Foreground="#FFFFFF" Height="50" Width="50"/>
             </Grid>
         </mah:Tile>
+
+        <!-- Bound to MainHomePageViewModel.DisplayProgressRing, which the tiles toggle, so a
+             tile click has a visible effect on this page. The equivalent ring in
+             MainWindow.xaml is bound to the shell's own view model. -->
+        <mah:ProgressRing IsActive="{Binding DisplayProgressRing}"
+                          Grid.RowSpan="4" Grid.ColumnSpan="5"
+                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </Page>

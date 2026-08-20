@@ -29,6 +29,40 @@ Page keys are matched **case-insensitively** (`NavigationService` stores registr
 `Dictionary<string, ...>` built with `StringComparer.OrdinalIgnoreCase`), so a menu `Label` of
 "inventory" resolves the page registered as "Inventory".
 
+## Navigating from a view model
+
+`INavigationService` returns a `System.Windows.Controls.Page` and lives in the Desktop
+project, so view models cannot call it: `AutoLotManager.ViewModel` targets netstandard2.0
+and the Desktop project already references it, which would make the dependency both circular
+and UI-bound.
+
+Use `AutoLotManager.Core.Navigation.IPageNavigator` instead:
+
+```csharp
+public class InventoryHomePageViewModel : ViewModelBase
+{
+    private readonly IPageNavigator _pageNavigator;
+
+    public InventoryHomePageViewModel(IPageNavigator pageNavigator)
+    {
+        _pageNavigator = pageNavigator;
+        OpenExportInventoryListCommand = new DelegateCommand(
+            () => _pageNavigator.NavigateTo("ExportInventoryList"));
+    }
+}
+```
+
+The view model raises a request; `MainWindow` subscribes to `NavigationRequested` and
+performs the actual navigation through `INavigationService`. Nothing in `Core` or
+`ViewModel` knows what a page is.
+
+`IPageNavigator` is registered as a **singleton** — the view models raising requests and the
+shell handling them must share one instance, or the shell never hears the request.
+
+Page keys are the same keys `NavigationConfiguration` registers, matched case-insensitively.
+`InventoryHomePageViewModel` declares its keys as constants so they cannot drift silently
+from the registrations.
+
 ## How to Add a New Page
 
 To add a new navigable page to the application:
@@ -227,8 +261,18 @@ All of the following are validated at **run time**, not compile time — `Regist
 The view model type is not validated at all.
 
 If navigation fails, the NavigationService throws. Logging is the caller's responsibility, and it
-is **selective**: `hmcLeftMenu_ItemClick` in `MainWindow.xaml.cs` catches `InvalidOperationException`
-and `ArgumentException` (which covers `ArgumentNullException`) and writes them to Debug output.
-Anything else propagates and takes the app down — most plausibly the `MissingMethodException` you
-get from `Activator.CreateInstance` when a registered page or view model has no public parameterless
-constructor.
+is **selective**. The private `MainWindow.NavigateTo` — which both menu handlers and
+`IPageNavigator` requests funnel through — catches `InvalidOperationException`, `ArgumentException`
+(which covers `ArgumentNullException`) and `TargetInvocationException`, writing each to Debug
+output. `TargetInvocationException` is the wrapper `Activator.CreateInstance` puts around anything
+a page's constructor throws, so it is the difference between a page failing to open and the
+application terminating.
+
+Anything else still propagates and takes the app down — most plausibly the `MissingMethodException`
+you get when a registered page or view model has no public parameterless constructor, which is
+thrown by `Activator.CreateInstance` itself rather than wrapped.
+
+**One path is not covered.** When a view model calls `IPageNavigator.NavigateTo` with a key that is
+null, empty or whitespace, `PageNavigator` throws *before* raising its event, so the exception
+surfaces out of the command rather than reaching `MainWindow.NavigateTo`. Nothing catches it. Use
+the page-key constants rather than string literals.
