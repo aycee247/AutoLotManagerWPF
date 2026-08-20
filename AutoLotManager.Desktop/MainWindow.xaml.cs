@@ -4,6 +4,7 @@ using AutoLotManager.ViewModel;
 using MahApps.Metro.Controls;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 
 namespace AutoLotManager.Desktop
@@ -98,6 +99,16 @@ namespace AutoLotManager.Desktop
             catch (ArgumentException ex)
             {
                 Debug.WriteLine($"Navigation error: {ex.Message}");
+            }
+            catch (TargetInvocationException ex)
+            {
+                // NavigationService builds pages with Activator.CreateInstance, which wraps
+                // anything the page's constructor throws. Without this catch a page that fails
+                // to construct takes the whole application down rather than failing to open —
+                // and pages here really do throw: the container tests measured MainHomePage
+                // raising XamlParseException and InventoryHomePage a FileNotFoundException
+                // outside a running Application.
+                Debug.WriteLine($"Navigation error constructing '{pageKey}': {ex.InnerException?.Message ?? ex.Message}");
             }
         }
     }

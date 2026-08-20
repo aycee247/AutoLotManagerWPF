@@ -261,8 +261,18 @@ All of the following are validated at **run time**, not compile time — `Regist
 The view model type is not validated at all.
 
 If navigation fails, the NavigationService throws. Logging is the caller's responsibility, and it
-is **selective**: `hmcLeftMenu_ItemClick` in `MainWindow.xaml.cs` catches `InvalidOperationException`
-and `ArgumentException` (which covers `ArgumentNullException`) and writes them to Debug output.
-Anything else propagates and takes the app down — most plausibly the `MissingMethodException` you
-get from `Activator.CreateInstance` when a registered page or view model has no public parameterless
-constructor.
+is **selective**. The private `MainWindow.NavigateTo` — which both menu handlers and
+`IPageNavigator` requests funnel through — catches `InvalidOperationException`, `ArgumentException`
+(which covers `ArgumentNullException`) and `TargetInvocationException`, writing each to Debug
+output. `TargetInvocationException` is the wrapper `Activator.CreateInstance` puts around anything
+a page's constructor throws, so it is the difference between a page failing to open and the
+application terminating.
+
+Anything else still propagates and takes the app down — most plausibly the `MissingMethodException`
+you get when a registered page or view model has no public parameterless constructor, which is
+thrown by `Activator.CreateInstance` itself rather than wrapped.
+
+**One path is not covered.** When a view model calls `IPageNavigator.NavigateTo` with a key that is
+null, empty or whitespace, `PageNavigator` throws *before* raising its event, so the exception
+surfaces out of the command rather than reaching `MainWindow.NavigateTo`. Nothing catches it. Use
+the page-key constants rather than string literals.

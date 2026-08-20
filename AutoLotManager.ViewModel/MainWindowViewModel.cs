@@ -97,8 +97,10 @@ namespace AutoLotManager.ViewModel
         /// </summary>
         /// <remarks>
         /// Effectively write-only today: the menu's SelectedItem binding pushes
-        /// values in, but no code reads the property back. The window's item
-        /// click handler goes to the control's own SelectedItem instead.
+        /// values in, but no code reads the property back. Since issue #66 the
+        /// window's click handlers use the item that was actually clicked
+        /// (ItemClickEventArgs.ClickedItem) rather than any selection state, so
+        /// nothing consults this property at all.
         /// </remarks>
         public object SelectedMenuItem
         {
@@ -124,14 +126,15 @@ namespace AutoLotManager.ViewModel
         public ICommand WindowLoadedCommand { get; }
 
         /// <summary>
-        /// Command bound to the tiles on the home and tiles-demo pages. Each
-        /// execution flips <see cref="DisplayProgressRing"/>, showing or hiding
-        /// the progress ring; it does not start any actual work.
+        /// Flips <see cref="DisplayProgressRing"/>, showing or hiding the window's progress
+        /// ring; it does not start any actual work.
         /// </summary>
         /// <remarks>
-        /// Those pages reach this command only while they are still inheriting
-        /// the main window's DataContext. Once navigation assigns a page its own
-        /// view model, the binding no longer resolves and the tiles do nothing.
+        /// Bound to the tiles on TilesDefaultPage. The home page no longer binds here: since
+        /// issue #65 its tiles bind to the identically named command on
+        /// <c>MainHomePageViewModel</c>, which the navigation service assigns as that page's
+        /// DataContext. Relying on a page inheriting this window's DataContext is what made
+        /// those tiles stop working, so do not bind a new page to this command.
         /// </remarks>
         public ICommand ProgressTileClickedCommand { get; }
 

@@ -15,17 +15,27 @@ namespace AutoLotManager.ViewModel.Pages.Inventory
     public class ExportInventoryListPageViewModel : ViewModelBase
     {
         /// <summary>
+        /// How many placeholder vehicles the constructor generates.
+        /// </summary>
+        /// <remarks>
+        /// Was 1000 while nothing constructed this view model. Now that the export page is
+        /// registered, this runs on the UI thread on every navigation to it — view models are
+        /// registered per-dependency, so the cost is paid per visit, not once. Kept small
+        /// until issue #74 replaces the generation with seed data from the database.
+        /// </remarks>
+        private const int SeedRecordCount = 50;
+
+        /// <summary>
         /// Creates the view model and fills <see cref="Cars"/>.
         /// </summary>
         /// <remarks>
-        /// No real inventory source is wired up yet, so the constructor
-        /// generates 1000 fake <see cref="Car"/> records with Bogus. That work
-        /// runs synchronously on the constructing thread and produces random
-        /// placeholder data unrelated to the records held by
-        /// <see cref="AutoLotManager.ViewModel.MainWindowViewModel"/>.
-        /// Nothing constructs this view model at present: the export page is
-        /// not registered with the navigation service and its code-behind never
-        /// sets a DataContext, so the cost is not currently paid at runtime.
+        /// No real inventory source is wired up yet, so the constructor generates
+        /// <see cref="SeedRecordCount"/> fake <see cref="Car"/> records with Bogus. That work
+        /// runs synchronously on the constructing thread — the UI thread, in the running
+        /// application — and produces random placeholder data unrelated to any other view
+        /// model's. Since issue #67 the export page is registered with the navigation service
+        /// and this view model is resolved from the container, so the cost is paid on every
+        /// navigation to that page. Issue #74 replaces it with seed data.
         /// </remarks>
         public ExportInventoryListPageViewModel()
         {
@@ -37,7 +47,7 @@ namespace AutoLotManager.ViewModel.Pages.Inventory
                 .RuleFor(c => c.Year, a => a.Random.Number(1980, 2024))
                 .RuleFor(c => c.Color, a => a.Commerce.Color());
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < SeedRecordCount; i++)
             {
                 var car = cars.Generate();
                 Cars.Add(car);
@@ -47,11 +57,11 @@ namespace AutoLotManager.ViewModel.Pages.Inventory
         private ObservableCollection<Car> _cars;
 
         /// <summary>
-        /// The vehicles the export page is meant to list. Populated in the
-        /// constructor with 1000 randomly generated placeholder records;
-        /// replacing the whole collection raises a change notification so the
-        /// view rebinds. The page's grid binds to this name, but the binding is
-        /// inert until something makes this view model the page's DataContext.
+        /// The vehicles the export page lists. Populated in the constructor with
+        /// <see cref="SeedRecordCount"/> randomly generated placeholder records; replacing the
+        /// whole collection raises a change notification so the view rebinds. The page's grid
+        /// binds to this name, and since issue #67 the navigation service supplies this view
+        /// model as the page's DataContext, so the binding resolves.
         /// </summary>
         public ObservableCollection<Car> Cars
         {
