@@ -94,7 +94,8 @@
                            OptionsItemTemplate="{StaticResource MenuItemTemplate}"
                         DisplayMode="CompactInline"
                            SelectedItem="{Binding SelectedMenuItem}"
-                           ItemClick="hmcLeftMenu_ItemClick">
+                           ItemClick="hmcLeftMenu_ItemClick"
+                           OptionsItemClick="hmcLeftMenu_OptionsItemClick">
             <!--  Content  -->
             
             <Grid x:Name="gridMenuContent">

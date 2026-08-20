@@ -1,4 +1,6 @@
 using AutoLotManager.Desktop.Pages;
+using AutoLotManager.Desktop.Pages.Inventory.AddEditInventory;
+using AutoLotManager.Desktop.Pages.Inventory;
 using AutoLotManager.ViewModel;
 using AutoLotManager.ViewModel.Pages.Inventory;
 
@@ -43,6 +45,14 @@ namespace AutoLotManager.Desktop.Navigation
 
             // Inventory page with view model
             navigationService.RegisterPage("Inventory", typeof(InventoryHomePage), typeof(InventoryHomePageViewModel));
+
+            // Reached from the tiles on the inventory home page rather than the menu.
+            // Keys match InventoryHomePageViewModel's constants.
+            navigationService.RegisterPage("AddEditInventory", typeof(AddEditInventoryPage));
+            navigationService.RegisterPage(
+                "ExportInventoryList",
+                typeof(ExportInventoryListPage),
+                typeof(ExportInventoryListPageViewModel));
 
             // Settings page - no view model for now
             navigationService.RegisterPage("Settings", typeof(SettingsHomePage));

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using AutoLotManager.Core.Navigation;
 using AutoLotManager.ViewModel;
+using AutoLotManager.ViewModel.Pages.Inventory;
 using NUnit.Framework;
 
 namespace AutoLotManager.Tests
@@ -60,56 +62,25 @@ namespace AutoLotManager.Tests
     [TestFixture]
     public class MainWindowViewModelTests
     {
-        // MainWindowViewModel's constructor generates 1000 Bogus Car records, so building one per
-        // test is needlessly expensive. Tests that only make read-only assertions share the single
-        // instance created in [OneTimeSetUp].
-        //
-        // Tests that mutate state (DisplayProgressRing, WindowTitle) or subscribe to
-        // PropertyChanged MUST keep constructing their own instance: sharing would leak state
-        // between them, break their "starts unset" preconditions, and make the fixture
-        // order-dependent. Do not "tidy" a mutating test onto _sharedViewModel.
-        private MainWindowViewModel _sharedViewModel;
-
-        [OneTimeSetUp]
-        public void CreateSharedViewModel()
-        {
-            _sharedViewModel = new MainWindowViewModel();
-        }
+        // Each test constructs its own view model. This fixture previously shared one
+        // instance created in [OneTimeSetUp] because the constructor generated 1000 Bogus
+        // Car records and doing that seven times was wasteful. That generation was removed
+        // in #68 — nothing displayed it — so construction is cheap again and the shared
+        // instance, along with its order-dependence hazard, is no longer needed.
 
         [Test]
         public void Constructor_WiresUpAllCommands()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(_sharedViewModel.WindowLoadedCommand, Is.Not.Null);
-                Assert.That(_sharedViewModel.ProgressTileClickedCommand, Is.Not.Null);
-                Assert.That(_sharedViewModel.GithubIconClickedCommand, Is.Not.Null);
-            });
-        }
-
-        [Test]
-        public void Constructor_PopulatesCarsWithGeneratedInventory()
-        {
-            Assert.That(_sharedViewModel.Cars, Is.Not.Null);
-            Assert.That(_sharedViewModel.Cars, Is.Not.Empty);
-        }
-
-        [Test]
-        public void Constructor_GeneratesCarsWithPopulatedFields()
-        {
-            var car = _sharedViewModel.Cars.First();
+            var viewModel = new MainWindowViewModel();
 
             Assert.Multiple(() =>
             {
-                Assert.That(car.Vin, Is.Not.Null.And.Not.Empty);
-                Assert.That(car.Make, Is.Not.Null.And.Not.Empty);
-                Assert.That(car.Model, Is.Not.Null.And.Not.Empty);
-                Assert.That(car.Color, Is.Not.Null.And.Not.Empty);
-                Assert.That(car.Year, Is.InRange(1980, 2024));
+                Assert.That(viewModel.WindowLoadedCommand, Is.Not.Null);
+                Assert.That(viewModel.ProgressTileClickedCommand, Is.Not.Null);
+                Assert.That(viewModel.GithubIconClickedCommand, Is.Not.Null);
             });
         }
 
-        // Everything below mutates state or observes events, so each test builds its own instance.
         [Test]
         public void WindowLoaded_SetsTheWindowTitle()
         {
@@ -156,6 +127,128 @@ namespace AutoLotManager.Tests
             viewModel.SelectedMenuItem = "Inventory";
 
             Assert.That(raised, Does.Contain("SelectedMenuItem"));
+        }
+    }
+
+    /// <summary>
+    /// The home page's tiles bind to ProgressTileClickedCommand. Before #65 that command
+    /// existed only on MainWindowViewModel, so the binding stopped resolving the moment the
+    /// navigation service assigned this view model as the page's DataContext and clicking a
+    /// tile silently did nothing. These tests pin the command to the view model the page
+    /// actually receives.
+    /// </summary>
+    [TestFixture]
+    public class MainHomePageViewModelTests
+    {
+        [Test]
+        public void Constructor_ExposesTheCommandTheHomePageBindsTo()
+        {
+            var viewModel = new MainHomePageViewModel();
+
+            Assert.That(viewModel.ProgressTileClickedCommand, Is.Not.Null);
+        }
+
+        [Test]
+        public void ProgressTileClickedCommand_TogglesDisplayProgressRing()
+        {
+            var viewModel = new MainHomePageViewModel();
+            Assert.That(viewModel.DisplayProgressRing, Is.False, "precondition: ring starts hidden");
+
+            viewModel.ProgressTileClickedCommand.Execute(null);
+            Assert.That(viewModel.DisplayProgressRing, Is.True);
+
+            viewModel.ProgressTileClickedCommand.Execute(null);
+            Assert.That(viewModel.DisplayProgressRing, Is.False);
+        }
+
+        [Test]
+        public void SettingDisplayProgressRing_RaisesPropertyChanged()
+        {
+            var viewModel = new MainHomePageViewModel();
+            var raised = new List<string>();
+            viewModel.PropertyChanged += (s, e) => raised.Add(e.PropertyName);
+
+            viewModel.DisplayProgressRing = true;
+
+            Assert.That(raised, Does.Contain("DisplayProgressRing"));
+        }
+    }
+
+    /// <summary>
+    /// The inventory page's two tiles bound to commands that existed on no view model at
+    /// all, so both clicks did nothing. These tests pin the commands and the page keys they
+    /// navigate to.
+    /// </summary>
+    [TestFixture]
+    public class InventoryHomePageViewModelTests
+    {
+        private sealed class RecordingPageNavigator : IPageNavigator
+        {
+            public List<string> Requested { get; } = new List<string>();
+
+            public event EventHandler<PageNavigationEventArgs> NavigationRequested;
+
+            public void NavigateTo(string pageKey)
+            {
+                Requested.Add(pageKey);
+                NavigationRequested?.Invoke(this, new PageNavigationEventArgs(pageKey));
+            }
+        }
+
+        [Test]
+        public void Constructor_ExposesBothCommandsTheInventoryPageBindsTo()
+        {
+            var viewModel = new InventoryHomePageViewModel(new RecordingPageNavigator());
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewModel.OpenAddEditInventoryPageCommand, Is.Not.Null);
+                Assert.That(viewModel.OpenExportInventoryListCommand, Is.Not.Null);
+            });
+        }
+
+        [Test]
+        public void Constructor_NullNavigator_ThrowsArgumentNullException()
+        {
+            // A null navigator would restore the original defect in a harder-to-find form:
+            // the command would exist and then fail at click time.
+            Assert.That(
+                () => new InventoryHomePageViewModel(null),
+                Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void OpenAddEditInventoryPageCommand_RequestsTheAddEditPage()
+        {
+            var navigator = new RecordingPageNavigator();
+            var viewModel = new InventoryHomePageViewModel(navigator);
+
+            viewModel.OpenAddEditInventoryPageCommand.Execute(null);
+
+            Assert.That(navigator.Requested, Is.EqualTo(new[] { "AddEditInventory" }));
+        }
+
+        [Test]
+        public void OpenExportInventoryListCommand_RequestsTheExportPage()
+        {
+            var navigator = new RecordingPageNavigator();
+            var viewModel = new InventoryHomePageViewModel(navigator);
+
+            viewModel.OpenExportInventoryListCommand.Execute(null);
+
+            Assert.That(navigator.Requested, Is.EqualTo(new[] { "ExportInventoryList" }));
+        }
+
+        // The keys the commands use must match the ones NavigationConfiguration registers.
+        // They are constants precisely so this cannot drift silently.
+        [Test]
+        public void PageKeyConstants_MatchTheRegisteredKeys()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(InventoryHomePageViewModel.AddEditInventoryPageKey, Is.EqualTo("AddEditInventory"));
+                Assert.That(InventoryHomePageViewModel.ExportInventoryListPageKey, Is.EqualTo("ExportInventoryList"));
+            });
         }
     }
 }

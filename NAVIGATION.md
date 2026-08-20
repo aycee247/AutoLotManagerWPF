@@ -29,6 +29,40 @@ Page keys are matched **case-insensitively** (`NavigationService` stores registr
 `Dictionary<string, ...>` built with `StringComparer.OrdinalIgnoreCase`), so a menu `Label` of
 "inventory" resolves the page registered as "Inventory".
 
+## Navigating from a view model
+
+`INavigationService` returns a `System.Windows.Controls.Page` and lives in the Desktop
+project, so view models cannot call it: `AutoLotManager.ViewModel` targets netstandard2.0
+and the Desktop project already references it, which would make the dependency both circular
+and UI-bound.
+
+Use `AutoLotManager.Core.Navigation.IPageNavigator` instead:
+
+```csharp
+public class InventoryHomePageViewModel : ViewModelBase
+{
+    private readonly IPageNavigator _pageNavigator;
+
+    public InventoryHomePageViewModel(IPageNavigator pageNavigator)
+    {
+        _pageNavigator = pageNavigator;
+        OpenExportInventoryListCommand = new DelegateCommand(
+            () => _pageNavigator.NavigateTo("ExportInventoryList"));
+    }
+}
+```
+
+The view model raises a request; `MainWindow` subscribes to `NavigationRequested` and
+performs the actual navigation through `INavigationService`. Nothing in `Core` or
+`ViewModel` knows what a page is.
+
+`IPageNavigator` is registered as a **singleton** — the view models raising requests and the
+shell handling them must share one instance, or the shell never hears the request.
+
+Page keys are the same keys `NavigationConfiguration` registers, matched case-insensitively.
+`InventoryHomePageViewModel` declares its keys as constants so they cannot drift silently
+from the registrations.
+
 ## How to Add a New Page
 
 To add a new navigable page to the application:

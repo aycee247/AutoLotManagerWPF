@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Autofac;
+using AutoLotManager.Core.Navigation;
 using AutoLotManager.Desktop;
 using AutoLotManager.Desktop.Navigation;
 using AutoLotManager.Desktop.Pages;
@@ -116,6 +117,33 @@ namespace AutoLotManager.Tests
             var container = _container;
 
             Assert.That(container.Resolve<InventoryHomePageViewModel>(), Is.Not.Null);
+        }
+
+        [Test]
+        public void Resolve_PageNavigator_Succeeds()
+        {
+            var container = _container;
+
+            // The view-model-facing navigation seam. Registered as a singleton because the
+            // view models raising requests and MainWindow handling them must share one
+            // instance — a per-dependency registration would mean the shell never hears them.
+            Assert.That(container.Resolve<IPageNavigator>(), Is.Not.Null);
+        }
+
+        [Test]
+        public void PageNavigator_IsRegisteredAsASingleton()
+        {
+            var container = _container;
+
+            Assert.That(container.Resolve<IPageNavigator>(), Is.SameAs(container.Resolve<IPageNavigator>()));
+        }
+
+        [Test]
+        public void Resolve_ExportInventoryListPageViewModel_Succeeds()
+        {
+            var container = _container;
+
+            Assert.That(container.Resolve<ExportInventoryListPageViewModel>(), Is.Not.Null);
         }
 
         [Test]
@@ -247,6 +275,12 @@ namespace AutoLotManager.Tests
 
         [TestCase("Home")]
         [TestCase("Inventory")]
+        // Added in #65: reached from the inventory page's tiles rather than the menu. Like
+        // Home and Inventory these are real XAML pages, so the honest assertion is that the
+        // key resolves to *something* — an unregistered key is refused with
+        // InvalidOperationException before the page type is touched at all.
+        [TestCase("AddEditInventory")]
+        [TestCase("ExportInventoryList")]
         public void RegisterPages_KeysWhosePagesCannotBeConstructedInATestHost(string pageKey)
         {
             var navigationService = ConfiguredNavigationService();

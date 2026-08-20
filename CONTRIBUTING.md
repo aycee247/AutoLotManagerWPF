@@ -338,13 +338,30 @@ The conventions, in prose:
 
 ## Commit and PR flow
 
+This project uses **trunk-based development with short-lived branches**. `master` is
+the only long-lived branch and is always releasable. The full rationale is recorded in
+[`docs/adr/0001-branching-strategy.md`](docs/adr/0001-branching-strategy.md).
+
 1. **Branch off `master`.** Do not commit to `master` directly. If you do not have
    push access to this repository, fork it first and branch in your fork.
 
    ```powershell
    git fetch origin master
-   git checkout -b feature/my-change origin/master
+   git checkout -b fix/65-tile-click-commands origin/master
    ```
+
+   Name branches `<type>/<issue-number>-<short-slug>`, where type is one of
+   `feat`, `fix`, `docs`, `chore`, `spike` or `test`.
+
+   **One issue per branch by default.** A branch may cover several stories from the
+   same epic when they touch the same contended files — the Desktop `.csproj`,
+   `MainWindow.xaml`, `Bootstrapper.cs` and `NavigationConfiguration.cs` are the
+   usual reason. Splitting those across branches produces conflicts, not isolation.
+
+   **Keep branches short — hours or days, not weeks.** A branch that cannot merge
+   within about a week is too big and should be split. Long-lived side branches are
+   how this repository previously ended up with a compile error and a startup crash
+   sitting outside `master` for months.
 
 2. **Keep commits focused.** One logical change per commit; do not mix a refactor
    with a behaviour change.
@@ -369,3 +386,7 @@ The conventions, in prose:
    - [ ] Tests added or updated for new behaviour in `Core`, `ViewModel`, or
          `Navigation`.
    - [ ] No `bin/`, `obj/`, `packages/`, or `.vs/` artefacts in the diff.
+   - [ ] **Documentation describing what you changed has been updated in the same
+         PR** — see the table in [`CLAUDE.md`](CLAUDE.md) for which document covers
+         what. A stale document is worse than a missing one.
+   - [ ] The issue this branch closes is referenced, and its epic checklist ticked.
