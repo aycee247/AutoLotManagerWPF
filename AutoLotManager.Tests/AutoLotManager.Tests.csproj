@@ -21,7 +21,7 @@
     <!-- NavigationService's constructor takes an Autofac.IContainer, so the signature
          has to resolve here even though the tests pass null. Version matches the one
          the Desktop project pins in packages.config. -->
-    <PackageReference Include="Autofac" Version="5.2.0" />
+    <PackageReference Include="Autofac" Version="9.3.2" />
   </ItemGroup>
 
   <ItemGroup>
