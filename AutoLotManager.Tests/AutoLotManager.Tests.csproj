@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit" Version="4.6.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <!-- NavigationService's constructor takes an Autofac.IContainer, so the signature
          has to resolve here even though the tests pass null. Version matches the one
