@@ -15,20 +15,41 @@ updates:
     commit-message:
       prefix: ci
 
-  # NuGet packages across the solution. Note the two project styles: the SDK-style projects
-  # (Core, ViewModel, Tests) use PackageReference and are fully supported, while the legacy
-  # Desktop project uses packages.config, which Dependabot supports only partially — expect
-  # fewer or no PRs for that project.
+  # NuGet packages for the SDK-style projects only.
+  #
+  # AutoLotManager.Desktop is deliberately NOT covered. It is a legacy packages.config
+  # project, and Dependabot's partial support for that format actively corrupts it. Of the
+  # five PRs from the first run against it:
+  #
+  #   #51 Autofac      - correct, and green
+  #   #52 Bogus        - BROKEN: bumped Bogus in packages.config, but also rewrote the csproj's
+  #                      Autofac reference to 9.3.2 while leaving packages.config at 5.2.0. The
+  #                      restore installs 5.2.0, the HintPath points at a Autofac.9.3.2 folder
+  #                      that does not exist, and the build fails with
+  #                      "CS0246: The type or namespace name 'Autofac' could not be found".
+  #   #53 CommonServiceLocator - same failure mode
+  #   #54 ControlzEx / #55 MahApps - the coupling deadlock described under `groups` below
+  #
+  # A dependency bot that desynchronises packages.config from the csproj produces PRs that
+  # are worse than no PRs: one of them looked like a Bogus bump and was actually a broken
+  # Autofac downgrade. Desktop packages are updated by hand until that project is migrated to
+  # PackageReference, at which point this exclusion should be removed.
   - package-ecosystem: nuget
-    directory: /
+    directories:
+      - /AutoLotManager.Core
+      - /AutoLotManager.ViewModel
+      - /AutoLotManager.Tests
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
     commit-message:
       prefix: deps
-    # Version-locked families must be bumped together or not at all. Without these groups
+    # Version-locked families must be bumped together or not at all. Without groups
     # Dependabot opens one PR per package, and coupled packages then block each other
-    # permanently: PR #55 (MahApps 2.1.1 -> 2.4.11) failed with
+    # permanently. These patterns are kept even though the packages they name currently live
+    # in the excluded Desktop project, so the rule is already in place when that project moves
+    # to PackageReference. The deadlock they prevent, for the record: PR #55
+    # (MahApps 2.1.1 -> 2.4.11) failed with
     #   error MC1000: Cannot resolve dependency to assembly
     #   'Microsoft.Windows.Design.Extensibility, Version=4.3.1.0'
     # because that assembly version comes from ControlzEx 4.3.1, which MahApps 2.4.11 has
